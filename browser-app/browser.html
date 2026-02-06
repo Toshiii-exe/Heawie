@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heartbeat Browser</title>
+    <link rel="stylesheet" href="browser.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Outfit:wght@300;400;500&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="browser-container">
+        <!-- Tab Bar -->
+        <div class="tabs-bar">
+            <div class="tabs-list" id="tabsList">
+                <div class="tab active" id="tab-initial">
+                    <span class="tab-title">Heartbeat</span>
+                    <span class="tab-close">&times;</span>
+                </div>
+            </div>
+            <button id="addTabBtn" class="add-tab-btn">+</button>
+        </div>
+
+        <!-- Navigation Bar -->
+        <div class="nav-bar">
+            <div class="nav-controls">
+                <button id="backBtn" class="nav-btn" title="Back" aria-label="Go back">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <button id="forwardBtn" class="nav-btn" title="Forward" aria-label="Go forward">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                </button>
+                <button id="reloadBtn" class="nav-btn" title="Reload" aria-label="Reload page">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2" />
+                    </svg>
+                </button>
+                <button id="homeBtn" class="nav-btn home-btn" title="Home (Heartbeat)"
+                    aria-label="Go to Heartbeat home">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="address-bar-container">
+                <input type="text" id="addressBar" class="address-bar" placeholder="Enter URL or search..."
+                    aria-label="Address bar" />
+            </div>
+        </div>
+
+        <!-- Web Content -->
+        <div id="webviewsContainer" class="webviews-container">
+            <webview id="wv-tab-initial" src="heartbeat/index.html" allowpopups></webview>
+        </div>
+    </div>
+
+    <!-- Right Sidebar Actions (Global) -->
+    <div class="right-sidebar">
+        <!-- Settings Toggle -->
+        <button class="control-btn" id="settingsToggle" title="Settings" aria-label="Open Settings">
+            <span class="icon">⚙️</span>
+        </button>
+
+        <!-- Notebook Toggle -->
+        <button class="control-btn" id="notebookToggle" title="My Journal" aria-label="Open Notebook">
+            <span class="icon">📖</span>
+        </button>
+    </div>
+
+    <!-- Settings Overlay -->
+    <div class="settings-overlay" id="settingsOverlay">
+        <div class="settings-panel">
+            <div class="settings-header">
+                <h2>Settings</h2>
+                <button class="close-modal-btn" id="closeSettings">&times;</button>
+            </div>
+
+            <div class="settings-section">
+                <h3>Appearance</h3>
+
+                <div class="setting-row">
+                    <label>Mode</label>
+                    <div class="toggle-switch-wrapper">
+                        <span>Dark</span>
+                        <label class="switch">
+                            <input type="checkbox" id="lightModeToggle">
+                            <span class="slider round"></span>
+                        </label>
+                        <span>Light</span>
+                    </div>
+                </div>
+
+                <div class="setting-row vertical">
+                    <label>Theme</label>
+                    <div class="theme-grid">
+                        <button class="wallpaper-btn active" data-wallpaper="aurora" title="Aurora">✨</button>
+                        <button class="wallpaper-btn" data-wallpaper="space" title="Space">🌌</button>
+                        <button class="wallpaper-btn" data-wallpaper="stars" title="Stars">⭐</button>
+                        <button class="wallpaper-btn" data-wallpaper="cosmic" title="Cosmic">🌠</button>
+                        <button class="wallpaper-btn" data-wallpaper="rainbow" title="Rainbow">🌈</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>Typography</h3>
+                <div class="setting-row vertical">
+                    <label>Font Style</label>
+                    <select id="fontSelector" class="settings-dropdown">
+                        <option value="default">Modern (Default)</option>
+                        <option value="serif">Elegant Serif</option>
+                        <option value="monospace">Coding Type</option>
+                        <option value="cursive">Handwritten</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notebook Overlay -->
+    <div class="notebook-overlay" id="notebookOverlay">
+        <div class="notebook-book">
+            <div class="notebook-cover-left"></div>
+            <div class="notebook-paper">
+                <div class="notebook-header">
+                    <span class="notebook-date" id="notebookDate">Today</span>
+                    <div class="notebook-controls">
+                        <button id="prevPage" title="Previous Page">←</button>
+                        <span id="pageIndicator">Pg 1</span>
+                        <button id="nextPage" title="Next Page">→</button>
+                        <button class="close-notebook" id="closeNotebook">&times;</button>
+                    </div>
+                </div>
+                <div class="notebook-lines-container">
+                    <textarea id="notebookContent" class="notebook-textarea"
+                        placeholder="Write your thoughts..."></textarea>
+                    <div class="notebook-lines-bg"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+
+</html>
