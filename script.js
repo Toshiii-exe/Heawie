@@ -37,7 +37,7 @@ const CONFIG = {
     minAnimationDuration: 1200, // Fastest pulse
 
     // Dynamic Secret Message Configuration
-    messagesJsonUrl: './messages.json', // Path to external messages file
+    messagesJsonUrl: 'https://raw.githubusercontent.com/Toshiii-exe/Heawie/main/messages.json', // Path to external messages file
     messageFetchMode: 'latest', // 'latest' or 'random'
     cacheBustParam: true, // Add timestamp to prevent caching
 
