@@ -415,30 +415,32 @@ function renderSecretContent() {
         return;
     }
 
-    // Select message based on mode
-    let selectedMessage;
-    if (CONFIG.messageFetchMode === 'latest') {
-        selectedMessage = secretMessageData.messages[secretMessageData.messages.length - 1];
-    } else { // random
-        const randomIndex = Math.floor(Math.random() * secretMessageData.messages.length);
-        selectedMessage = secretMessageData.messages[randomIndex];
-    }
+    // Daily Mode Implementation: Find a message that matches TODAY's date
+    const now = new Date();
+    const todayStr = now.toISOString().split('T')[0]; // Format: YYYY-MM-DD
 
-    const { title, paragraphs, signature, timestamp } = selectedMessage;
-
-    let html = `<h2>${title}</h2>`;
-    paragraphs.forEach(para => {
-        html += `<p class="secret-message">${para}</p>`;
+    // Find the message for today
+    const todayMessage = secretMessageData.messages.find(m => {
+        // Check if timestamp is exactly today's date string
+        return m.timestamp === todayStr;
     });
-    html += `<div class="secret-signature">${signature}</div>`;
 
-    secretContentDiv.innerHTML = html;
-
-    // Show timestamp if available
-    if (timestamp) {
-        const date = new Date(timestamp);
-        messageStatus.textContent = `(Message from ${date.toLocaleDateString()})`;
+    if (todayMessage) {
+        const { title, paragraphs, signature } = todayMessage;
+        let html = `<h2>${title}</h2>`;
+        paragraphs.forEach(para => {
+            html += `<p class="secret-message">${para}</p>`;
+        });
+        html += `<div class="secret-signature">${signature}</div>`;
+        secretContentDiv.innerHTML = html;
+        messageStatus.textContent = '';
     } else {
+        // No message for today: Show waiting screen
+        secretContentDiv.innerHTML = `
+            <h2>Check back tomorrow... ❤️</h2>
+            <p class="secret-message">There isn't a new message for today yet, but the heartbeat is still here for you.</p>
+            <div class="secret-signature">— Always yours</div>
+        `;
         messageStatus.textContent = '';
     }
 }
