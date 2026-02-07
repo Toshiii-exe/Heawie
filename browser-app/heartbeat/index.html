@@ -120,14 +120,6 @@
                             <stop offset="0%" class="gradient-start" />
                             <stop offset="100%" class="gradient-end" />
                         </linearGradient>
-                        <linearGradient id="rainbow-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" style="stop-color:#ff9a9e" />
-                            <stop offset="20%" style="stop-color:#fad0c4" />
-                            <stop offset="40%" style="stop-color:#ffecd2" />
-                            <stop offset="60%" style="stop-color:#a1c4fd" />
-                            <stop offset="80%" style="stop-color:#c2e9fb" />
-                            <stop offset="100%" style="stop-color:#d4fc79" />
-                        </linearGradient>
                     </defs>
                     <!-- Heart Path -->
                     <path class="heart-path"
@@ -198,16 +190,8 @@
 
         <!-- Secret Area (Hidden until unlocked) -->
         <div class="secret-area" id="secretArea" role="region" aria-label="Secret message">
-            <div class="envelope-wrapper">
-                <div class="envelope" id="envelope">
-                    <div class="flap"></div>
-                    <div class="front"></div>
-                    <div class="letter">
-                        <div class="letter-content" id="secretContent">
-                            <!-- Content will be dynamically loaded from JavaScript -->
-                        </div>
-                    </div>
-                </div>
+            <div class="secret-content" id="secretContent">
+                <!-- Content will be dynamically loaded from JavaScript -->
             </div>
             <div class="message-status" id="messageStatus"></div>
         </div>

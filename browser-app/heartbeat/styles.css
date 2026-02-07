@@ -41,109 +41,6 @@
     --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
-/* ===== LIGHT MODE THEME ===== */
-body.light-mode {
-    --bg-base: #f8fafc;
-    --bg-tint: rgba(248, 250, 252, 0.8);
-    --text-primary: #1e293b;
-    --text-secondary: #64748b;
-    --text-glow: rgba(0, 0, 0, 0.05);
-    --glass-bg: rgba(255, 255, 255, 0.7);
-    --glass-border: 1px solid rgba(0, 0, 0, 0.1);
-    --glass-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-}
-
-body.light-mode .background-container {
-    opacity: 0.12;
-    /* Even softer for cleaner look */
-}
-
-body.light-mode .background-container::after {
-    background: radial-gradient(circle at center, transparent 0%, #f8fafc 100%);
-}
-
-body.light-mode .heart-svg {
-    filter: drop-shadow(0 0 15px rgba(255, 122, 160, 0.2)) drop-shadow(0 0 5px rgba(0, 0, 0, 0.05));
-}
-
-body.light-mode .heart-path {
-    stroke: rgba(255, 122, 160, 0.3);
-    stroke-width: 1px;
-}
-
-body.light-mode .lock-icon {
-    color: #1e293b;
-    /* Dark Slate */
-    opacity: 0.8;
-}
-
-body.light-mode .lock-icon:hover {
-    color: var(--heart-color-start);
-}
-
-
-body.light-mode .widget-card {
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-}
-
-body.light-mode .timer-display {
-    color: #0f172a;
-    text-shadow: none;
-}
-
-body.light-mode .timer-btn,
-body.light-mode .todo-input-group input {
-    background: #f1f5f9;
-    border-color: #e2e8f0;
-    color: #0f172a;
-}
-
-body.light-mode .todo-item {
-    color: #1e293b;
-    border-color: #f1f5f9;
-}
-
-body.light-mode .greeting,
-body.light-mode .clock {
-    color: #0f172a;
-    text-shadow: none;
-}
-
-body.light-mode .idle-word {
-    color: #334155;
-    text-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-}
-
-body.light-mode .search-box {
-    background: #fff;
-    border-color: #e2e8f0;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-body.light-mode .search-box input {
-    color: #0f172a;
-}
-
-body.light-mode .quick-link {
-    background: #fff;
-    border-color: #e2e8f0;
-    color: #64748b;
-}
-
-body.light-mode .modal-content {
-    background: #fff;
-    color: #0f172a;
-}
-
-body.light-mode .input-group input {
-    background: #f8fafc;
-    border-color: #e2e8f0;
-    color: #0f172a;
-}
-
-
 /* ===== 2. RESET & BASE ===== */
 *,
 *::before,
@@ -168,34 +65,6 @@ body {
     /* Align top for scrolling */
     transition: background 1s ease;
 }
-
-/* Custom Scrollbar for Heartbeat */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.2);
-}
-
-body.light-mode ::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.1);
-}
-
-body.light-mode ::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.2);
-}
-
 
 button {
     font-family: 'Outfit', sans-serif;
@@ -1006,18 +875,6 @@ body.breathing-active .header-container {
     }
 }
 
-/* Light Mode Breathing Fix */
-body.light-mode .breathing-circle {
-    border-color: var(--accent-color);
-    box-shadow: 0 0 30px var(--accent-color);
-}
-
-body.light-mode .breathing-text {
-    color: var(--text-primary);
-    font-weight: 500;
-}
-
-
 
 /* ===== 9. MODALS (Unlock) ===== */
 .unlock-modal {
@@ -1109,9 +966,10 @@ body.light-mode .breathing-text {
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 100vh;
-    background: rgba(10, 10, 10, 0.9);
-    backdrop-filter: blur(20px);
+    height: 80vh;
+    /* Cover most of screen */
+    background: rgba(10, 10, 10, 0.95);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
     transform: translateY(110%);
     transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
     z-index: 200;
@@ -1126,237 +984,37 @@ body.light-mode .breathing-text {
     transform: translateY(0);
 }
 
-/* Envelope Animation */
-.envelope-wrapper {
-    position: relative;
-    width: 600px;
-    height: 380px;
-    perspective: 1500px;
-    margin-top: 100px;
-    /* Give room for letter pop-up */
-}
-
-
-.envelope {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #3e3e4f;
-    border-radius: 0 0 10px 10px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-    transition: transform 1s ease;
-}
-
-.envelope .flap {
-    position: absolute;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #4a4a5e;
-    clip-path: polygon(0 0, 100% 0, 50% 50%);
-    z-index: 3;
-    transition: transform 0.6s ease, z-index 0.2s 0.2s;
-    transform-origin: top;
-    border-radius: 10px 10px 0 0;
-}
-
-.envelope .front {
-    position: absolute;
-    inset: 0;
-    z-index: 4;
-    clip-path: polygon(0 40%, 50% 100%, 100% 40%, 100% 100%, 0 100%);
-    background-color: #3e3e4f;
-    border-radius: 0 0 10px 10px;
-}
-
-.envelope .letter {
-    position: absolute;
-    top: 5%;
-    left: 5%;
-    width: 90%;
-    height: 95%;
-    background: #fff;
-    border-radius: 5px;
-    z-index: 2;
-    transition: transform 0.8s ease 0.4s;
-    padding: 50px 60px;
-    /* More padding for better orientation */
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    color: #333;
-    overflow-y: auto;
-    font-family: 'Outfit', sans-serif;
-}
-
-/* Open State */
-.envelope.open .flap {
-    transform: rotateX(180deg);
-    z-index: 1;
-}
-
-.envelope.open .letter {
-    transform: translateY(-40%);
-    /* Slightly less to stay on screen */
-    z-index: 5;
-    height: 100%;
-    /* Better fit */
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-}
-
-
-.letter-content {
-    opacity: 0;
-    transition: opacity 0.5s ease 0.8s;
-}
-
-.envelope.open .letter-content {
-    opacity: 1;
-}
-
-.letter-content h2 {
-    color: var(--accent-color);
-    margin-bottom: 2rem;
-    font-weight: 500;
-    font-size: 2.2rem;
-    text-align: center;
-}
-
-
-.secret-message {
-    line-height: 1.7;
-    margin-bottom: 1rem;
-}
-
-.secret-signature {
-    margin-top: 3rem;
-    font-family: 'Dancing Script', cursive;
-    font-size: 2rem;
-    color: #444;
-    text-align: right;
-    padding-right: 20px;
-}
-
-
-/* Light Mode Envelope */
-body.light-mode .envelope {
-    background-color: #e2e8f0;
-}
-
-body.light-mode .flap {
-    background-color: #cbd5e1;
-}
-
-body.light-mode .front {
-    background-color: #e2e8f0;
-}
-
-@media (max-width: 768px) {
-    .envelope-wrapper {
-        width: 90vw;
-        height: 60vw;
-    }
-}
-
-
 
 /* ===== 10. COLOR THEMES (Overrides) ===== */
-
-/* Aurora (Default) - Added Ethereal Halo */
+/* Aurora (Default) */
 body[data-wallpaper="aurora"] {
     --accent-color: #a78bfa;
     --heart-color-start: #c8a2ff;
 }
 
-body[data-wallpaper="aurora"] .heart-container::before {
-    content: '';
-    position: absolute;
-    inset: -20px;
-    background: radial-gradient(circle, rgba(167, 139, 250, 0.1) 0%, transparent 70%);
-    border-radius: 50%;
-    animation: pulseGlow 4s infinite alternate;
-}
-
-/* Space - Added Planetary Ring */
+/* Space */
 body[data-wallpaper="space"] {
     --accent-color: #64b5f6;
     --heart-color-start: #90caf9;
 }
 
-body[data-wallpaper="space"] .heart::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 140%;
-    height: 40%;
-    border: 2px solid rgba(100, 181, 246, 0.2);
-    border-radius: 50%;
-    transform: translate(-50%, -50%) rotate(-15deg);
-    pointer-events: none;
-    box-shadow: 0 0 15px rgba(100, 181, 246, 0.1);
-}
-
-/* Stars - Added Moon and Sparkles */
+/* Stars */
 body[data-wallpaper="stars"] {
     --accent-color: #ffb347;
     --heart-color-start: #ffd89b;
 }
 
-body[data-wallpaper="stars"] .heart-container::after {
-    content: '🌙';
-    position: absolute;
-    top: -30px;
-    right: -30px;
-    font-size: 1.5rem;
-    filter: drop-shadow(0 0 10px var(--accent-color));
-    animation: float 6s ease-in-out infinite;
-}
-
-/* Cosmic - Added Nebula Mist */
+/* Cosmic */
 body[data-wallpaper="cosmic"] {
     --accent-color: #ff9eb7;
     --heart-color-start: #ff9eb7;
 }
 
-body[data-wallpaper="cosmic"] .heart-glow {
-    background: radial-gradient(circle, var(--heart-glow) 0%, rgba(255, 158, 183, 0.1) 40%, transparent 70%);
-    filter: blur(40px);
-}
-
-/* Rainbow - Added Prism Effect */
+/* Rainbow */
 body[data-wallpaper="rainbow"] {
     --accent-color: #ffb3d9;
     --heart-color-start: #ffb3d9;
 }
-
-body[data-wallpaper="rainbow"] .heart-path {
-    fill: url(#rainbow-gradient);
-}
-
-@keyframes pulseGlow {
-    from {
-        opacity: 0.3;
-        transform: scale(1);
-    }
-
-    to {
-        opacity: 0.6;
-        transform: scale(1.1);
-    }
-}
-
-@keyframes float {
-
-    0%,
-    100% {
-        transform: translateY(0);
-    }
-
-    50% {
-        transform: translateY(-10px);
-    }
-}
-
 
 
 /* ===== 11. RESPONSIVE ===== */

@@ -37,7 +37,7 @@ const CONFIG = {
     minAnimationDuration: 1200, // Fastest pulse
 
     // Dynamic Secret Message Configuration
-    messagesJsonUrl: './messages.json', // Path to external messages file
+    messagesJsonUrl: 'https://raw.githubusercontent.com/Toshiii-exe/Heawie/main/messages.json', // Path to external messages file
     messageFetchMode: 'latest', // 'latest' or 'random'
     cacheBustParam: true, // Add timestamp to prevent caching
 
@@ -139,11 +139,11 @@ function loadUserPreferences() {
         currentWallpaper = savedWallpaper;
     }
 
-    // Always start locked for a fresh experience each session
-    isUnlocked = false;
-    document.body.classList.remove('unlocked');
-    if (lockIcon) lockIcon.classList.remove('unlocked');
-
+    if (savedUnlocked === 'true') {
+        isUnlocked = true;
+        document.body.classList.add('unlocked');
+        lockIcon.classList.add('unlocked');
+    }
 
     // Load click message index
     if (savedClickIndex !== null) {
@@ -415,30 +415,32 @@ function renderSecretContent() {
         return;
     }
 
-    // Select message based on mode
-    let selectedMessage;
-    if (CONFIG.messageFetchMode === 'latest') {
-        selectedMessage = secretMessageData.messages[secretMessageData.messages.length - 1];
-    } else { // random
-        const randomIndex = Math.floor(Math.random() * secretMessageData.messages.length);
-        selectedMessage = secretMessageData.messages[randomIndex];
-    }
+    // Daily Mode Implementation: Find a message that matches TODAY's date
+    const now = new Date();
+    const todayStr = now.toISOString().split('T')[0]; // Format: YYYY-MM-DD
 
-    const { title, paragraphs, signature, timestamp } = selectedMessage;
-
-    let html = `<h2>${title}</h2>`;
-    paragraphs.forEach(para => {
-        html += `<p class="secret-message">${para}</p>`;
+    // Find the message for today
+    const todayMessage = secretMessageData.messages.find(m => {
+        // Check if timestamp is exactly today's date string
+        return m.timestamp === todayStr;
     });
-    html += `<div class="secret-signature">${signature}</div>`;
 
-    secretContentDiv.innerHTML = html;
-
-    // Show timestamp if available
-    if (timestamp) {
-        const date = new Date(timestamp);
-        messageStatus.textContent = `(Message from ${date.toLocaleDateString()})`;
+    if (todayMessage) {
+        const { title, paragraphs, signature } = todayMessage;
+        let html = `<h2>${title}</h2>`;
+        paragraphs.forEach(para => {
+            html += `<p class="secret-message">${para}</p>`;
+        });
+        html += `<div class="secret-signature">${signature}</div>`;
+        secretContentDiv.innerHTML = html;
+        messageStatus.textContent = '';
     } else {
+        // No message for today: Show waiting screen
+        secretContentDiv.innerHTML = `
+            <h2>Check back tomorrow... ❤️</h2>
+            <p class="secret-message">There isn't a new message for today yet, but the heartbeat is still here for you.</p>
+            <div class="secret-signature">— Always yours</div>
+        `;
         messageStatus.textContent = '';
     }
 }
@@ -757,9 +759,6 @@ function setupLockClick() {
 
     const handleLockClick = () => {
         if (!isUnlocked) {
-            // Fetch latest messages before opening
-            fetchSecretMessages();
-
             // Open unlock modal
             if (unlockModal && secretInput) {
                 unlockModal.classList.add('active');
@@ -778,8 +777,6 @@ function setupLockClick() {
             // Hide secret area
             if (secretArea) {
                 secretArea.classList.remove('visible');
-                const env = document.getElementById('envelope');
-                if (env) env.classList.remove('open');
             }
 
             saveUserPreferences();
@@ -866,11 +863,6 @@ function checkSecret() {
         if (secretArea) {
             setTimeout(() => {
                 secretArea.classList.add('visible');
-                // Open envelope after slide-up
-                setTimeout(() => {
-                    const env = document.getElementById('envelope');
-                    if (env) env.classList.add('open');
-                }, 1000);
             }, 500);
         }
     } else {
