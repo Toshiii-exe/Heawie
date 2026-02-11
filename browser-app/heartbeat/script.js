@@ -1027,17 +1027,14 @@ const SoundManager = {
 
     updateUI() {
         const btn = document.getElementById('toggleSound');
-        const iconOff = btn.querySelector('.icon-off');
-        const iconOn = btn.querySelector('.icon-on');
+        if (!btn) return;
 
         if (this.isMuted) {
             btn.classList.remove('active');
-            if (iconOff) iconOff.style.display = 'block';
-            if (iconOn) iconOn.style.display = 'none';
+            btn.textContent = 'Mute';
         } else {
             btn.classList.add('active');
-            if (iconOff) iconOff.style.display = 'none';
-            if (iconOn) iconOn.style.display = 'block';
+            btn.textContent = 'Unmuted';
         }
     },
 
@@ -1111,6 +1108,12 @@ function setupControls() {
                 breathingGuide.classList.toggle('active', this.isActive);
             }
             document.body.classList.toggle('breathing-active', this.isActive);
+
+            const btn = document.getElementById('toggleBreathing');
+            if (btn) {
+                btn.classList.toggle('active', this.isActive);
+                btn.textContent = this.isActive ? 'Exit Breathing' : 'Breathing Mode';
+            }
 
             // Play sound if starting
             if (this.isActive && typeof SoundManager !== 'undefined' && !SoundManager.isMuted) {
