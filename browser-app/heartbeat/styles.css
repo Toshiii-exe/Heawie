@@ -164,6 +164,68 @@ body.light-mode .search-icon {
     color: #888;
 }
 
+body.light-mode .header-content {
+    background: rgba(255, 255, 255, 0.6);
+    border-color: rgba(0, 0, 0, 0.1);
+    color: #333;
+}
+
+body.light-mode .header-content .greeting,
+body.light-mode .header-content .divider,
+body.light-mode .header-content .clock {
+    color: #333;
+}
+
+body.light-mode .timer-display {
+    color: #2c3e50;
+    /* Darker blue-grey for readability */
+}
+
+body.light-mode .widget-card {
+    background: rgba(255, 255, 255, 0.7);
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .widget-header {
+    color: #555;
+}
+
+body.light-mode .message {
+    color: #2c3e50;
+    text-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+}
+
+body.light-mode .todo-item span {
+    color: #333;
+}
+
+body.light-mode .preset-btn {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.1);
+    color: #444;
+}
+
+body.light-mode .preset-btn:hover {
+    background: var(--accent-color);
+    color: #000;
+}
+
+body.light-mode .timer-input {
+    background: rgba(255, 255, 255, 0.8);
+    color: #000;
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
+body.light-mode .timer-btn {
+    background: rgba(0, 0, 0, 0.05);
+    color: #333;
+}
+
+body.light-mode .timer-btn:hover {
+    background: var(--accent-color);
+    color: #000;
+}
+
 /* ===== 4. UI HUD (Fixed Controls) ===== */
 
 /* Glass Button Base Style */
