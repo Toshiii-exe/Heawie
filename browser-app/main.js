@@ -42,6 +42,7 @@ function createWindow() {
 
     // Remove the default menu bar completely
     mainWindow.removeMenu();
+    mainWindow.setMenu(null);
 
     // Load the browser UI
     mainWindow.loadFile('browser.html');
