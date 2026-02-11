@@ -25,7 +25,13 @@
             <div class="widget-header">
                 <span>⏱️ Timer</span>
             </div>
-            <div class="timer-display" id="timerDisplay">00:00</div>
+            <div class="timer-display" id="timerDisplay">05:00</div>
+            <div class="timer-presets">
+                <button class="preset-btn" data-time="300">5m</button>
+                <button class="preset-btn" data-time="600">10m</button>
+                <button class="preset-btn" data-time="900">15m</button>
+                <input type="number" id="timerCustom" class="timer-input" placeholder="Min" min="1" max="999">
+            </div>
             <div class="timer-controls">
                 <button id="timerToggle" class="timer-btn">Start</button>
                 <button id="timerReset" class="timer-btn">Reset</button>

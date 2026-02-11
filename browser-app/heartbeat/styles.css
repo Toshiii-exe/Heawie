@@ -1134,13 +1134,47 @@ body[data-wallpaper="rainbow"] {
 
 /* TIMER WIDGET */
 .timer-display {
-    font-size: 2.5rem;
-    font-weight: 300;
-    color: var(--text-primary);
+    font-size: 3rem;
+    font-family: 'Dancing Script', cursive;
+    color: var(--accent-color);
+    margin: 10px 0;
+    transition: all 0.3s ease;
     text-align: center;
-    font-variant-numeric: tabular-nums;
-    margin-bottom: 1rem;
-    text-shadow: 0 0 15px var(--text-glow);
+}
+
+.timer-presets {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.preset-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #eee;
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+}
+
+.preset-btn:hover {
+    background: var(--accent-color);
+    color: #000;
+}
+
+.timer-input {
+    width: 50px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    text-align: center;
 }
 
 .timer-controls {
@@ -1289,4 +1323,72 @@ body[data-wallpaper="rainbow"] {
         transform: none;
         flex: 1;
     }
+}
+
+/* ===== NEW UPDATES RE-APPLIED ===== */
+
+/* Custom Scrollbar - Global */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-color) rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--accent-color);
+    border-radius: 10px;
+    opacity: 0.5;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--heart-color-end);
+}
+
+/* Timer Finished Pulse */
+.timer-display.finished {
+    color: #ff4d4d !important;
+    animation: timerPulse 1s infinite alternate;
+    text-shadow: 0 0 20px rgba(255, 77, 77, 0.5);
+}
+
+@keyframes timerPulse {
+    from {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    to {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+/* Hide redundant controls moved to browser bar */
+.controls-container {
+    display: none !important;
+}
+
+/* Hide sidebar and other UI when breathing */
+body.breathing-active .heart-container,
+body.breathing-active .message-container,
+body.breathing-active .idle-word,
+body.breathing-active .search-container,
+body.breathing-active .widget-sidebar,
+body.breathing-active .header-container {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1s ease;
+}
+
+/* Adjust search container padding if box is hidden */
+.search-container {
+    margin-top: 20px;
 }

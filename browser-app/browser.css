@@ -117,6 +117,28 @@ body.light-mode ::-webkit-scrollbar-thumb {
     border-color: rgba(255, 107, 157, 0.3);
 }
 
+.nav-divider {
+    width: 1px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 0 8px;
+    align-self: center;
+}
+
+#globalSoundBtn.active {
+    color: #ffaaec;
+    background: rgba(255, 107, 157, 0.15);
+    border-color: rgba(255, 107, 157, 0.3);
+    box-shadow: 0 0 10px rgba(255, 107, 157, 0.2);
+}
+
+#globalBreathingBtn.active {
+    color: #64ffda;
+    background: rgba(100, 255, 218, 0.15);
+    border-color: rgba(100, 255, 218, 0.3);
+    box-shadow: 0 0 10px rgba(100, 255, 218, 0.2);
+}
+
 .address-bar-container {
     flex: 1;
     display: flex;

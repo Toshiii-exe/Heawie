@@ -7,6 +7,8 @@ const forwardBtn = document.getElementById('forwardBtn');
 const reloadBtn = document.getElementById('reloadBtn');
 const homeBtn = document.getElementById('homeBtn');
 const addTabBtn = document.getElementById('addTabBtn');
+const globalSoundBtn = document.getElementById('globalSoundBtn');
+const globalBreathingBtn = document.getElementById('globalBreathingBtn');
 
 // ===== CONFIG =====
 const HOME_URL = 'heartbeat/index.html';
@@ -57,21 +59,42 @@ function setupNavigationControls() {
     });
 
     addressBar.addEventListener('focus', () => addressBar.select());
+
+    // Global Sound Toggle
+    globalSoundBtn.addEventListener('click', () => {
+        const wv = TabManager.getActiveWebview();
+        if (wv) {
+            wv.executeJavaScript('if(typeof SoundManager !== "undefined") SoundManager.toggleMute()');
+            updateGlobalControlsState(); // Re-sync after click
+        }
+    });
+
+    // Global Breathing Toggle
+    globalBreathingBtn.addEventListener('click', () => {
+        const wv = TabManager.getActiveWebview();
+        if (wv) {
+            wv.executeJavaScript('if(window.BreathingMode) window.BreathingMode.toggle()').then(() => {
+                updateGlobalControlsState(); // Re-sync after click
+            });
+        }
+    });
 }
 
 // Navigate based on user input
 function navigateToInput(input, targetWv) {
     if (!input || !targetWv) return;
 
-    let url = input;
-    // Check if it's a URL or search query
+    let url = input.trim();
+
+    // Improved Regex for faster/cleaner domain detection
+    const isDomain = /^[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/i.test(url);
+
     if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('file://')) {
-        // Check if it looks like a domain (has dot, no spaces)
-        if (url.includes('.') && !url.includes(' ') && /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(url)) {
+        if (isDomain && !url.includes(' ')) {
             url = 'https://' + url;
         } else {
-            // Treat as search query - use DuckDuckGo
-            url = `https://duckduckgo.com/?q=${encodeURIComponent(url)}`;
+            // Google search is optimized for speed and accuracy
+            url = `https://www.google.com/search?q=${encodeURIComponent(url)}`;
         }
     }
 
@@ -221,7 +244,28 @@ function updateNavigationButtons() {
         try {
             backBtn.disabled = !wv.canGoBack();
             forwardBtn.disabled = !wv.canGoForward();
+            updateGlobalControlsState();
         } catch (e) { }
+    }
+}
+
+// Sync global control button icons/states with active page
+async function updateGlobalControlsState() {
+    const wv = TabManager.getActiveWebview();
+    if (!wv) return;
+
+    try {
+        // Sync Sound State
+        const isMuted = await wv.executeJavaScript('typeof SoundManager !== "undefined" ? SoundManager.isMuted : true');
+        globalSoundBtn.classList.toggle('active', !isMuted);
+
+        // Sync Breathing State
+        const isBreathing = await wv.executeJavaScript('window.BreathingMode ? window.BreathingMode.isActive : false');
+        globalBreathingBtn.classList.toggle('active', isBreathing);
+    } catch (e) {
+        // Fallback or ignore if script not ready
+        globalSoundBtn.classList.remove('active');
+        globalBreathingBtn.classList.remove('active');
     }
 }
 

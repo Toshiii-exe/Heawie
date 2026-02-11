@@ -559,10 +559,19 @@ function setupSearchBar() {
 
     searchBar.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
-            const query = searchBar.value.trim();
-            if (query) {
-                window.location.href = `https://duckduckgo.com/?q=${encodeURIComponent(query)}`;
+            let query = searchBar.value.trim();
+            if (!query) return;
+
+            const isDomain = /^[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/i.test(query);
+
+            if (!query.startsWith('http://') && !query.startsWith('https://') && !query.startsWith('file://')) {
+                if (isDomain && !query.includes(' ')) {
+                    query = 'https://' + query;
+                } else {
+                    query = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+                }
             }
+            window.location.href = query;
         }
     });
 
@@ -1064,17 +1073,17 @@ const SoundManager = {
     },
 
     playClick() {
-        // Soft "droplet" sound (sine waves)
-        this.playTone(300, 'sine', 0.15, 0.08);
-        this.playTone(500, 'sine', 0.1, 0.05, 0.05);
+        // Soft "droplet" sound (sine waves) - Louder
+        this.playTone(300, 'sine', 0.15, 0.15);
+        this.playTone(500, 'sine', 0.1, 0.1, 0.05);
     },
 
     playUnlock() {
-        // Magical chime (ascending major chord)
-        this.playTone(261.63, 'sine', 0.6, 0.05, 0);    // C4
-        this.playTone(329.63, 'sine', 0.6, 0.05, 0.1);  // E4
-        this.playTone(392.00, 'sine', 0.6, 0.05, 0.2);  // G4
-        this.playTone(523.25, 'sine', 1.0, 0.05, 0.3);  // C5
+        // Magical chime (ascending major chord) - Louder
+        this.playTone(261.63, 'sine', 0.6, 0.1, 0);    // C4
+        this.playTone(329.63, 'sine', 0.6, 0.1, 0.1);  // E4
+        this.playTone(392.00, 'sine', 0.6, 0.1, 0.2);  // G4
+        this.playTone(523.25, 'sine', 1.0, 0.15, 0.3);  // C5
     }
 };
 
@@ -1091,83 +1100,129 @@ function setupControls() {
         });
     }
 
-    // Breathing Toggle
-    if (toggleBreathing && breathingGuide) {
-        toggleBreathing.addEventListener('click', () => {
-            breathingGuide.classList.toggle('active');
-            document.body.classList.toggle('breathing-active'); // Toggle visibility of other elements
+    // Breathing System
+    window.BreathingMode = {
+        isActive: false,
+        toggle() {
+            this.isActive = !this.isActive;
+            const breathingGuide = document.getElementById('breathingGuide');
 
-            // Toggle button state
-            toggleBreathing.classList.toggle('active');
+            if (breathingGuide) {
+                breathingGuide.classList.toggle('active', this.isActive);
+            }
+            document.body.classList.toggle('breathing-active', this.isActive);
 
-            // If sound is on and breathing guide just became active, play a start chime
-            if (breathingGuide.classList.contains('active') && !SoundManager.isMuted) {
+            // Play sound if starting
+            if (this.isActive && typeof SoundManager !== 'undefined' && !SoundManager.isMuted) {
                 SoundManager.playClick();
             }
+
+            return this.isActive;
+        }
+    };
+
+    if (toggleBreathing) {
+        toggleBreathing.addEventListener('click', () => {
+            window.BreathingMode.toggle();
         });
     }
 }
 
-/* ===== TIMER WIDGET ===== */
+/* ===== TIMER WIDGET (Countdown) ===== */
 const TimerManager = {
     interval: null,
-    seconds: 0,
+    totalSeconds: 300, // Default 5m
+    remainingSeconds: 300,
     isRunning: false,
 
     init() {
         this.display = document.getElementById('timerDisplay');
-        this.btnStart = document.getElementById('timerToggle');
+        this.btnToggle = document.getElementById('timerToggle');
         this.btnReset = document.getElementById('timerReset');
+        this.customInput = document.getElementById('timerCustom');
+        this.presetBtns = document.querySelectorAll('.preset-btn');
 
-        if (this.btnStart) {
-            this.btnStart.addEventListener('click', () => this.toggle());
+        if (this.btnToggle) this.btnToggle.addEventListener('click', () => this.toggle());
+        if (this.btnReset) this.btnReset.addEventListener('click', () => this.reset());
+
+        if (this.customInput) {
+            this.customInput.addEventListener('change', () => {
+                const mins = parseInt(this.customInput.value);
+                if (mins > 0) this.setTime(mins * 60);
+            });
         }
-        if (this.btnReset) {
-            this.btnReset.addEventListener('click', () => this.reset());
-        }
+
+        this.presetBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const secs = parseInt(btn.dataset.time);
+                this.setTime(secs);
+            });
+        });
+
+        this.updateDisplay();
+    },
+
+    setTime(secs) {
+        this.pause();
+        this.totalSeconds = secs;
+        this.remainingSeconds = secs;
+        this.updateDisplay();
     },
 
     toggle() {
-        if (this.isRunning) {
-            this.pause();
-        } else {
-            this.start();
-        }
+        if (this.isRunning) this.pause();
+        else this.start();
     },
 
     start() {
-        if (this.isRunning) return;
+        if (this.isRunning || this.remainingSeconds <= 0) return;
         this.isRunning = true;
-        this.btnStart.textContent = 'Pause';
+        this.btnToggle.textContent = 'Pause';
+        this.display.classList.remove('finished');
+
         this.interval = setInterval(() => {
-            this.seconds++;
+            this.remainingSeconds--;
             this.updateDisplay();
+
+            if (this.remainingSeconds <= 0) {
+                this.finish();
+            }
         }, 1000);
     },
 
     pause() {
         this.isRunning = false;
-        this.btnStart.textContent = 'Start';
+        if (this.btnToggle) this.btnToggle.textContent = 'Start';
         clearInterval(this.interval);
     },
 
     reset() {
         this.pause();
-        this.seconds = 0;
+        this.remainingSeconds = this.totalSeconds;
+        this.display.classList.remove('finished');
         this.updateDisplay();
+    },
+
+    finish() {
+        this.pause();
+        this.display.classList.add('finished');
+        if (typeof SoundManager !== 'undefined' && !SoundManager.isMuted) {
+            SoundManager.playUnlock();
+        }
     },
 
     updateDisplay() {
         if (!this.display) return;
-        const h = Math.floor(this.seconds / 3600);
-        const m = Math.floor((this.seconds % 3600) / 60);
-        const s = this.seconds % 60;
+        const m = Math.floor(this.remainingSeconds / 60);
+        const s = this.remainingSeconds % 60;
+        this.display.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 
-        const hDisplay = h > 0 ? `${h}:` : '';
-        const mDisplay = String(m).padStart(2, '0');
-        const sDisplay = String(s).padStart(2, '0');
-
-        this.display.textContent = `${hDisplay}${mDisplay}:${sDisplay}`;
+        // Visual feedback when low
+        if (this.remainingSeconds < 10 && this.remainingSeconds > 0) {
+            this.display.style.color = 'var(--heart-color-end)';
+        } else {
+            this.display.style.color = '';
+        }
     }
 };
 
