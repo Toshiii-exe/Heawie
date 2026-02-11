@@ -35,8 +35,13 @@ function createWindow() {
         },
         icon: path.join(__dirname, 'assets', 'icon.png'),
         backgroundColor: '#1a1a2e',
-        show: false
+        show: false,
+        title: "Heawie",
+        autoHideMenuBar: true
     });
+
+    // Remove the default menu bar completely
+    mainWindow.removeMenu();
 
     // Load the browser UI
     mainWindow.loadFile('browser.html');
@@ -73,8 +78,8 @@ app.on('window-all-closed', () => {
 ipcMain.on('navigate', (event, url) => {
     // Validate URL
     if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('file://')) {
-        // Treat as search query - use DuckDuckGo
-        url = `https://duckduckgo.com/?q=${encodeURIComponent(url)}`;
+        // Treat as search query - use Google
+        url = `https://www.google.com/search?q=${encodeURIComponent(url)}`;
     }
     event.reply('navigate-to', url);
 });
