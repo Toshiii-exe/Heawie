@@ -1,7 +1,7 @@
 {
-    "name": "heartbeat-browser",
+    "name": "heawie",
     "version": "1.0.0",
-    "description": "Heartbeat - A minimal browser with the Heartbeat experience as home",
+    "description": "Heawie - A minimal browser with the Heartbeat experience as home",
     "main": "main.js",
     "scripts": {
         "start": "set ELECTRON_RUN_AS_NODE=&& electron .",
@@ -9,19 +9,19 @@
         "build:win": "electron-builder --win --x64"
     },
     "keywords": [
-        "heartbeat",
+        "heawie",
         "browser",
         "electron"
     ],
-    "author": "Heartbeat",
+    "author": "Heawie",
     "license": "MIT",
     "devDependencies": {
         "electron": "^28.0.0",
         "electron-builder": "^24.9.1"
     },
     "build": {
-        "appId": "com.heartbeat.browser",
-        "productName": "Heartbeat Browser",
+        "appId": "com.heawie.browser",
+        "productName": "Heawie",
         "directories": {
             "output": "dist"
         },
