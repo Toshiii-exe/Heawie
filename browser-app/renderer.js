@@ -393,7 +393,8 @@ const SettingsManager = {
     config: {
         darkMode: true,
         font: 'default',
-        theme: 'aurora'
+        theme: 'aurora',
+        customWallpaper: null
     },
 
     init() {
@@ -460,11 +461,35 @@ const SettingsManager = {
         wallpaperButtons.forEach(btn => {
             btn.addEventListener('click', () => {
                 const wallpaper = btn.getAttribute('data-wallpaper');
-                this.config.theme = wallpaper;
-                this.updateThemeButtons();
-                this.save();
+                if (wallpaper) {
+                    this.config.theme = wallpaper;
+                    this.config.customWallpaper = null; // Reset custom if choosing preset
+                    this.updateThemeButtons();
+                    this.save();
+                }
             });
         });
+
+        // 2b. Custom Wallpaper
+        const customBtn = document.getElementById('customWallpaperBtn');
+        const customInput = document.getElementById('customWallpaperInput');
+
+        if (customBtn && customInput) {
+            customBtn.addEventListener('click', () => customInput.click());
+            customInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        this.config.theme = 'custom';
+                        this.config.customWallpaper = event.target.result; // Base64
+                        this.updateThemeButtons();
+                        this.save();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
 
         // 3. Fonts
         if (fontSelector) {
@@ -482,6 +507,10 @@ const SettingsManager = {
                 btn.classList.add('active');
             }
         });
+        const customBtn = document.getElementById('customWallpaperBtn');
+        if (customBtn) {
+            customBtn.classList.toggle('active', this.config.theme === 'custom');
+        }
     },
 
     applyGlobal() {
@@ -508,13 +537,17 @@ const SettingsManager = {
         const wvs = targetWv ? [targetWv] : TabManager.tabs.map(t => t.wv);
         wvs.forEach(wv => {
             if (wv && typeof wv.executeJavaScript === 'function') {
+                const customWallpaperBase64 = this.config.customWallpaper;
                 const code = `
                 try {
                     // Update Theme
                     if (typeof setWallpaper === 'function') {
-                        setWallpaper('${this.config.theme}');
+                        setWallpaper('${this.config.theme}', ${customWallpaperBase64 ? `'${customWallpaperBase64}'` : 'null'});
                     } else {
                         localStorage.setItem('heartbeat_wallpaper', '${this.config.theme}');
+                        if('${this.config.theme}' === 'custom' && ${customWallpaperBase64 ? 'true' : 'false'}) {
+                             localStorage.setItem('heartbeat_custom_wallpaper', '${customWallpaperBase64}');
+                        }
                         if(document.body) document.body.setAttribute('data-wallpaper', '${this.config.theme}');
                     }
                     

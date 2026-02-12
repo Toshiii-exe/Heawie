@@ -132,6 +132,7 @@ function init() {
 // ===== LOCAL STORAGE PERSISTENCE =====
 function loadUserPreferences() {
     const savedWallpaper = localStorage.getItem('heartbeat_wallpaper');
+    const savedCustomWallpaper = localStorage.getItem('heartbeat_custom_wallpaper');
     const savedUnlocked = localStorage.getItem('heartbeat_unlocked');
     const savedClickIndex = localStorage.getItem('heartbeat_click_index');
 
@@ -152,10 +153,16 @@ function loadUserPreferences() {
             currentClickMessageIndex = index;
         }
     }
+
+    // Apply wallpaper (including custom)
+    setWallpaper(currentWallpaper, savedCustomWallpaper);
 }
 
-function saveUserPreferences() {
+function saveUserPreferences(customBase64 = null) {
     localStorage.setItem('heartbeat_wallpaper', currentWallpaper);
+    if (currentWallpaper === 'custom' && customBase64) {
+        localStorage.setItem('heartbeat_custom_wallpaper', customBase64);
+    }
     localStorage.setItem('heartbeat_unlocked', isUnlocked.toString());
     localStorage.setItem('heartbeat_click_index', currentClickMessageIndex.toString());
 }
@@ -222,8 +229,13 @@ function setupWallpaperSelector() {
     NotebookManager.init();
 }
 
-function setWallpaper(wallpaper) {
-    const url = CONFIG.wallpapers[wallpaper];
+function setWallpaper(wallpaper, customBase64 = null) {
+    let url = CONFIG.wallpapers[wallpaper];
+
+    // Support custom local pictures
+    if (wallpaper === 'custom' && customBase64) {
+        url = customBase64;
+    }
 
     // Set body attribute for CSS theme changes
     document.body.setAttribute('data-wallpaper', wallpaper);
@@ -232,7 +244,7 @@ function setWallpaper(wallpaper) {
         // Set as background image
         backgroundContainer.style.backgroundImage = `url('${url}')`;
     } else {
-        // Fallback to solid color
+        // Fallback or empty
         backgroundContainer.style.backgroundImage = 'none';
     }
 }
