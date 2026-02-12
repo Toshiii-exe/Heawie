@@ -416,7 +416,7 @@ function renderSecretContent() {
     }
 
     // Sequential Mode Implementation: Start from a fixed date
-    const startDate = new Date('2026-02-13T00:00:00'); // User requested to start from tomorrow (Feb 13)
+    const startDate = new Date('2026-02-14T00:00:00'); // User requested to start on Feb 14
     const now = new Date();
 
     // Calculate days passed since start date
@@ -448,8 +448,8 @@ function renderSecretContent() {
     } else {
         // Not yet Feb 13
         secretContentDiv.innerHTML = `
-            <h2>Starts Tomorrow... ❤️</h2>
-            <p class="secret-message">The heartbeat is counting down. Your first secret message will appear here on February 13th.</p>
+            <h2>Hearts in Sync... ❤️</h2>
+            <p class="secret-message">The heartbeat is counting down. Your secret journey officially begins on Valentine's Day.</p>
             <div class="secret-signature">— Always yours</div>
         `;
         messageStatus.textContent = '';
@@ -595,13 +595,13 @@ const ShortcutManager = {
     defaults: [
         { name: "YouTube", url: "https://youtube.com", icon: "https://cdn.simpleicons.org/youtube/FF0000" },
         { name: "Spotify", url: "https://open.spotify.com", icon: "https://cdn.simpleicons.org/spotify/1DB954" },
-        { name: "ChatGPT", url: "https://chat.openai.com", icon: "https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg" },
+        { name: "ChatGPT", url: "https://chatgpt.com", icon: "https://cdn.simpleicons.org/openai/412991" },
         { name: "Gmail", url: "https://mail.google.com", icon: "https://cdn.simpleicons.org/gmail/EA4335" },
         { name: "Netflix", url: "https://netflix.com", icon: "https://cdn.simpleicons.org/netflix/E50914" },
         { name: "Discord", url: "https://discord.com", icon: "https://cdn.simpleicons.org/discord/5865F2" },
         { name: "Reddit", url: "https://reddit.com", icon: "https://cdn.simpleicons.org/reddit/FF4500" },
         { name: "Instagram", url: "https://instagram.com", icon: "https://cdn.simpleicons.org/instagram/E4405F" },
-        { name: "Amazon", url: "https://amazon.com", icon: "https://cdn.simpleicons.org/amazon/FF9900" },
+        { name: "Prime Video", url: "https://www.primevideo.com", icon: "https://cdn.simpleicons.org/primevideo/00A8E1" },
         { name: "X", url: "https://twitter.com", icon: "https://cdn.simpleicons.org/x/000000", invert: true },
         { name: "GitHub", url: "https://github.com", icon: "https://cdn.simpleicons.org/github/181717", invert: true },
         { name: "Twitch", url: "https://twitch.tv", icon: "https://cdn.simpleicons.org/twitch/9146FF" }
@@ -665,7 +665,10 @@ const ShortcutManager = {
             const img = document.createElement('img');
             img.src = item.icon;
             img.alt = item.name;
-            if (item.invert) img.style.filter = "invert(1)";
+
+            if (item.invert) {
+                img.classList.add('invert-icon');
+            }
 
             const span = document.createElement('span');
             span.textContent = item.name;
