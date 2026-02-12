@@ -140,7 +140,20 @@ function setupWebviewListeners(wv, tabId) {
     });
 
     wv.addEventListener('new-window', (e) => {
+        e.preventDefault();
         TabManager.createTab(e.url);
+    });
+
+    wv.addEventListener('will-navigate', (e) => {
+        // If we are on the Heartbeat tab and try to navigate away (e.g. from speed dial),
+        // intercept and open in a new tab instead of overwriting the Heartbeat page.
+        if (tabId === 'tab-initial' && !e.url.includes('heartbeat/index.html')) {
+            const wvEl = TabManager.getWebviewById(tabId);
+            if (wvEl) {
+                wvEl.stop();
+                TabManager.createTab(e.url);
+            }
+        }
     });
 
     wv.addEventListener('dom-ready', () => {
@@ -156,6 +169,7 @@ const TabManager = {
         const initialWv = document.getElementById('wv-tab-initial');
         const initialTab = document.getElementById('tab-initial');
         if (initialWv && initialTab) {
+            initialWv.setAttribute('partition', 'persist:heawie_main'); // Speed up heartbeat
             this.register('tab-initial', initialWv, initialTab);
         }
     },
@@ -186,9 +200,15 @@ const TabManager = {
         wv.id = 'wv-' + id;
         wv.src = url;
         wv.setAttribute('allowpopups', 'true');
+        wv.setAttribute('partition', 'persist:heawie_main'); // Enable caching for speed
         webviewsContainer.appendChild(wv);
 
         this.register(id, wv, tabEl);
+    },
+
+    getWebviewById(id) {
+        const tab = this.tabs.find(t => t.id === id);
+        return tab ? tab.wv : null;
     },
 
     switch(id) {

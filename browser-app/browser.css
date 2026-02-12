@@ -314,22 +314,21 @@ webview {
     border: none;
 }
 
-/* Light Mode Overrides */
+/* Light Mode Overrides (Aggressive Visibility) */
+body.light-mode,
+body.light-mode .nav-bar * {
+    color: #0d121c !important;
+    /* Pure dark for visibility */
+}
+
 body.light-mode {
     background: #f1f5f9;
-    color: #0f172a !important;
-    /* Extremely dark for visibility */
 }
 
 body.light-mode .nav-bar {
-    background: rgba(255, 255, 255, 0.95);
-    border-color: rgba(0, 0, 0, 0.15);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-}
-
-body.light-mode .nav-bar * {
-    color: #1e293b;
-    /* Force everything in nav-bar to be dark */
+    background: #ffffff !important;
+    border-bottom: 1.5px solid #cbd5e1 !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
 }
 
 body.light-mode .control-btn {
@@ -378,19 +377,19 @@ body.light-mode .home-btn:hover {
 }
 
 body.light-mode .address-bar {
-    background: #fff;
-    color: #1e293b;
-    border-color: #cbd5e1;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    background: #ffffff !important;
+    color: #1e293b !important;
+    border: 1.5px solid #94a3b8 !important;
 }
 
-body.light-mode .address-bar:focus {
-    border-color: #ff9eb7;
-    box-shadow: 0 0 0 3px rgba(255, 107, 157, 0.1);
+body.light-mode .nav-btn,
+body.light-mode .control-btn {
+    background: #f1f5f9 !important;
+    border: 1px solid #cbd5e1 !important;
 }
 
-body.light-mode .address-bar::placeholder {
-    color: #94a3b8;
+body.light-mode svg {
+    stroke: #0f172a !important;
 }
 
 body.light-mode .nav-divider {

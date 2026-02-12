@@ -118,16 +118,18 @@ body.light-mode .notebook-date,
 body.light-mode h2,
 body.light-mode p,
 body.light-mode span,
-body.light-mode .header-content * {
-    color: #1e293b !important;
+body.light-mode .header-content *,
+body.light-mode .widget-card *,
+body.light-mode .secret-area * {
+    color: #0d121c !important;
     text-shadow: none !important;
 }
 
 body.light-mode .background-container {
-    opacity: 0.8;
-    /* Sufficiently visible but soft */
-    filter: brightness(1.2) saturate(0.8) contrast(0.9);
-    /* Soften for light mode */
+    opacity: 0.85;
+    filter: brightness(1.1) saturate(0.9);
+    will-change: transform;
+    /* Hardware acceleration */
 }
 
 /* Light Mode Vignette - blending themes better */
