@@ -618,7 +618,13 @@ const ShortcutManager = {
         const saved = localStorage.getItem('heartbeat_shortcuts');
         if (saved) {
             try {
-                this.items = JSON.parse(saved);
+                let items = JSON.parse(saved);
+                // Migration: Update Amazon to Prime Video and fix old URLs
+                this.items = items.map(item => {
+                    if (item.name === "Amazon") return this.defaults.find(d => d.name === "Prime Video");
+                    if (item.name === "ChatGPT") return this.defaults.find(d => d.name === "ChatGPT");
+                    return item;
+                });
             } catch (e) {
                 this.items = [...this.defaults];
             }
@@ -665,6 +671,17 @@ const ShortcutManager = {
             const img = document.createElement('img');
             img.src = item.icon;
             img.alt = item.name;
+
+            // Robust Fallback: if SimpleIcons or others fail, use Google Favicon API
+            img.onerror = () => {
+                try {
+                    const domain = new URL(item.url).hostname;
+                    img.src = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+                } catch (e) {
+                    img.src = 'https://www.google.com/s2/favicons?domain=amazon.com&sz=64'; // Extreme fallback
+                }
+                img.onerror = null;
+            };
 
             if (item.invert) {
                 img.classList.add('invert-icon');
