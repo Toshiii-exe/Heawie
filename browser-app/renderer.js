@@ -86,15 +86,16 @@ function navigateToInput(input, targetWv) {
 
     let url = input.trim();
 
-    // Improved Regex for faster/cleaner domain detection
-    const isDomain = /^[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/i.test(url);
+    // Enhanced Domain Check for speed and accuracy
+    const domainRegex = /^([a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.(com|org|net|io|edu|gov|me|ai|dev|app|local|top|site|info|online|shop))(:[0-9]{1,5})?(\/.*)?$/i;
+    const isDomain = domainRegex.test(url);
 
     if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('file://')) {
         if (isDomain && !url.includes(' ')) {
             url = 'https://' + url;
         } else {
-            // Google search is optimized for speed and accuracy
-            url = `https://www.google.com/search?q=${encodeURIComponent(url)}`;
+            // Faster Search URL with optimized parameters
+            url = `https://www.google.com/search?q=${encodeURIComponent(url)}&sourceid=chrome&ie=UTF-8`;
         }
     }
 

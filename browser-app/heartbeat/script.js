@@ -415,30 +415,41 @@ function renderSecretContent() {
         return;
     }
 
-    // Daily Mode Implementation: Find a message that matches TODAY's date
+    // Sequential Mode Implementation: Start from a fixed date
+    const startDate = new Date('2026-02-13T00:00:00'); // User requested to start from tomorrow (Feb 13)
     const now = new Date();
-    const todayStr = now.toISOString().split('T')[0]; // Format: YYYY-MM-DD
 
-    // Find the message for today
-    const todayMessage = secretMessageData.messages.find(m => {
-        // Check if timestamp is exactly today's date string
-        return m.timestamp === todayStr;
-    });
+    // Calculate days passed since start date
+    const diffTime = now - startDate;
+    const dayIndex = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-    if (todayMessage) {
-        const { title, paragraphs, signature } = todayMessage;
-        let html = `<h2>${title}</h2>`;
-        paragraphs.forEach(para => {
-            html += `<p class="secret-message">${para}</p>`;
-        });
-        html += `<div class="secret-signature">${signature}</div>`;
-        secretContentDiv.innerHTML = html;
-        messageStatus.textContent = '';
+    if (dayIndex >= 0) {
+        // We have messages!
+        const message = secretMessageData.messages[dayIndex];
+
+        if (message) {
+            const { title, paragraphs, signature } = message;
+            let html = `<h2>${title}</h2>`;
+            paragraphs.forEach(para => {
+                html += `<p class="secret-message">${para}</p>`;
+            });
+            html += `<div class="secret-signature">${signature}</div>`;
+            secretContentDiv.innerHTML = html;
+            messageStatus.textContent = '';
+        } else {
+            // Out of messages
+            secretContentDiv.innerHTML = `
+                <h2>To be continued... ❤️</h2>
+                <p class="secret-message">Every heartbeat brings us closer. Check back soon for more secrets.</p>
+                <div class="secret-signature">— Always yours</div>
+            `;
+            messageStatus.textContent = '';
+        }
     } else {
-        // No message for today: Show waiting screen
+        // Not yet Feb 13
         secretContentDiv.innerHTML = `
-            <h2>Check back tomorrow... ❤️</h2>
-            <p class="secret-message">There isn't a new message for today yet, but the heartbeat is still here for you.</p>
+            <h2>Starts Tomorrow... ❤️</h2>
+            <p class="secret-message">The heartbeat is counting down. Your first secret message will appear here on February 13th.</p>
             <div class="secret-signature">— Always yours</div>
         `;
         messageStatus.textContent = '';
