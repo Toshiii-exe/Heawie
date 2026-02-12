@@ -105,8 +105,22 @@ body::after {
 
 /* ===== LIGHT MODE OVERRIDES ===== */
 body.light-mode {
-    background: #eef2f5;
-    color: #444;
+    background: #f8fafc;
+    color: #0f172a !important;
+}
+
+body.light-mode .greeting,
+body.light-mode .clock,
+body.light-mode .message,
+body.light-mode .idle-word,
+body.light-mode .click-message,
+body.light-mode .notebook-date,
+body.light-mode h2,
+body.light-mode p,
+body.light-mode span,
+body.light-mode .header-content * {
+    color: #1e293b !important;
+    text-shadow: none !important;
 }
 
 body.light-mode .background-container {
@@ -415,25 +429,18 @@ body.light-mode .timer-btn:hover {
         transform: scale(1);
     }
 
-    15% {
-        transform: scale(1.08);
-    }
-
     30% {
-        transform: scale(1);
-    }
-
-    45% {
-        transform: scale(1.04);
-    }
-
-    60% {
-        transform: scale(1);
+        transform: scale(1.08);
     }
 
     100% {
         transform: scale(1);
     }
+}
+
+/* Reduced animation complexity for speed */
+.heart.skip .heart-svg {
+    animation: skipBeat 0.4s ease-out;
 }
 
 .heart.skip .heart-svg {

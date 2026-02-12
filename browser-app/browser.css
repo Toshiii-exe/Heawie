@@ -317,13 +317,19 @@ webview {
 /* Light Mode Overrides */
 body.light-mode {
     background: #f1f5f9;
-    color: #1e293b;
+    color: #0f172a !important;
+    /* Extremely dark for visibility */
 }
 
 body.light-mode .nav-bar {
-    background: rgba(255, 255, 255, 0.9);
-    border-color: rgba(0, 0, 0, 0.1);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+body.light-mode .nav-bar * {
+    color: #1e293b;
+    /* Force everything in nav-bar to be dark */
 }
 
 body.light-mode .control-btn {
