@@ -53,12 +53,7 @@
                 </button>
                 <div class="nav-divider"></div>
                 <!-- Global Controls -->
-                <button id="globalSoundBtn" class="nav-btn" title="Toggle Sound">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M11 5L6 9H2V15H6L11 19V5Z" />
-                        <path class="sound-waves" d="M19.07 4.93c1.8 1.8 1.8 4.9 0 6.7M15.54 8.46c.9.9.9 2.4 0 3.3" />
-                    </svg>
-                </button>
+
                 <button id="globalBreathingBtn" class="nav-btn" title="Toggle Breathing Mode">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z" />
@@ -92,10 +87,7 @@
             <span class="icon">⚙️</span>
         </button>
 
-        <!-- Notebook Toggle -->
-        <button class="control-btn" id="notebookToggle" title="My Journal" aria-label="Open Notebook">
-            <span class="icon">📖</span>
-        </button>
+
 
         <!-- Bookmarks Toggle -->
         <button class="control-btn" id="bookmarksToggle" title="Liked Pages" aria-label="Open Bookmarks">
@@ -155,28 +147,7 @@
         </div>
     </div>
 
-    <!-- Notebook Overlay -->
-    <div class="notebook-overlay" id="notebookOverlay">
-        <div class="notebook-book">
-            <div class="notebook-cover-left"></div>
-            <div class="notebook-paper">
-                <div class="notebook-header">
-                    <span class="notebook-date" id="notebookDate">Today</span>
-                    <div class="notebook-controls">
-                        <button id="prevPage" title="Previous Page">←</button>
-                        <span id="pageIndicator">Pg 1</span>
-                        <button id="nextPage" title="Next Page">→</button>
-                        <button class="close-notebook" id="closeNotebook">&times;</button>
-                    </div>
-                </div>
-                <div class="notebook-lines-container">
-                    <textarea id="notebookContent" class="notebook-textarea"
-                        placeholder="Write your thoughts..."></textarea>
-                    <div class="notebook-lines-bg"></div>
-                </div>
-            </div>
-        </div>
-    </div>
+
 
     <!-- Bookmarks Overlay -->
     <div class="bookmarks-overlay" id="bookmarksOverlay">

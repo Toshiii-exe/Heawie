@@ -7,7 +7,7 @@ const forwardBtn = document.getElementById('forwardBtn');
 const reloadBtn = document.getElementById('reloadBtn');
 const homeBtn = document.getElementById('homeBtn');
 const addTabBtn = document.getElementById('addTabBtn');
-const globalSoundBtn = document.getElementById('globalSoundBtn');
+
 const globalBreathingBtn = document.getElementById('globalBreathingBtn');
 
 // ===== CONFIG =====
@@ -60,14 +60,7 @@ function setupNavigationControls() {
 
     addressBar.addEventListener('focus', () => addressBar.select());
 
-    // Global Sound Toggle
-    globalSoundBtn.addEventListener('click', () => {
-        const wv = TabManager.getActiveWebview();
-        if (wv) {
-            wv.executeJavaScript('if(typeof SoundManager !== "undefined") SoundManager.toggleMute()');
-            updateGlobalControlsState(); // Re-sync after click
-        }
-    });
+
 
     // Global Breathing Toggle
     globalBreathingBtn.addEventListener('click', () => {
@@ -299,16 +292,13 @@ async function updateGlobalControlsState() {
     if (!wv) return;
 
     try {
-        // Sync Sound State
-        const isMuted = await wv.executeJavaScript('typeof SoundManager !== "undefined" ? SoundManager.isMuted : true');
-        globalSoundBtn.classList.toggle('active', !isMuted);
+
 
         // Sync Breathing State
         const isBreathing = await wv.executeJavaScript('window.BreathingMode ? window.BreathingMode.isActive : false');
         globalBreathingBtn.classList.toggle('active', isBreathing);
     } catch (e) {
         // Fallback or ignore if script not ready
-        globalSoundBtn.classList.remove('active');
         globalBreathingBtn.classList.remove('active');
     }
 }
@@ -455,119 +445,12 @@ document.addEventListener('DOMContentLoaded', init);
 
 // ===== GLOBAL UI FEATURES (Notebook & Settings) =====
 function setupGlobalUI() {
-    setupNotebook();
+
     BookmarksManager.init();
     SettingsManager.init();
 }
 
-// NOTEBOOK MANAGER
-const NotebookManager = {
-    pages: ["", "", "", "", ""],
-    currentPage: 0,
-    isOpen: false,
 
-    init() {
-        this.load();
-        this.setupUI();
-    },
-
-    load() {
-        const saved = localStorage.getItem('heartbeat_notebook');
-        if (saved) {
-            try {
-                this.pages = JSON.parse(saved);
-                if (!Array.isArray(this.pages) || this.pages.length === 0) {
-                    this.pages = [""];
-                }
-            } catch (e) {
-                this.pages = [""];
-            }
-        }
-    },
-
-    save() {
-        const textarea = document.getElementById('notebookContent');
-        if (textarea) {
-            this.pages[this.currentPage] = textarea.value;
-        }
-        localStorage.setItem('heartbeat_notebook', JSON.stringify(this.pages));
-    },
-
-    setupUI() {
-        const toggleBtn = document.getElementById('notebookToggle');
-        const overlay = document.getElementById('notebookOverlay');
-        const closeBtn = document.getElementById('closeNotebook');
-        const textarea = document.getElementById('notebookContent');
-        const prevBtn = document.getElementById('prevPage');
-        const nextBtn = document.getElementById('nextPage');
-        const dateDisplay = document.getElementById('notebookDate');
-
-        // Toggle Open/Close
-        if (toggleBtn) {
-            toggleBtn.addEventListener('click', () => {
-                if (this.isOpen) this.close();
-                else this.open();
-            });
-        }
-
-        if (closeBtn) closeBtn.addEventListener('click', () => this.close());
-
-        if (overlay) {
-            overlay.addEventListener('click', (e) => {
-                if (e.target === overlay) this.close();
-            });
-        }
-
-        if (textarea) textarea.addEventListener('input', () => this.save());
-
-        if (prevBtn) prevBtn.addEventListener('click', () => this.changePage(-1));
-        if (nextBtn) nextBtn.addEventListener('click', () => this.changePage(1));
-
-        document.addEventListener('keydown', (e) => {
-            if (this.isOpen && e.key === 'Escape') this.close();
-        });
-
-        if (dateDisplay) {
-            const options = { weekday: 'long', month: 'short', day: 'numeric' };
-            dateDisplay.textContent = new Date().toLocaleDateString('en-US', options);
-        }
-    },
-
-    open() {
-        this.isOpen = true;
-        document.getElementById('notebookOverlay').classList.add('active');
-        this.renderPage();
-    },
-
-    close() {
-        this.isOpen = false;
-        document.getElementById('notebookOverlay').classList.remove('active');
-        this.save();
-    },
-
-    changePage(delta) {
-        this.save();
-        const newIndex = this.currentPage + delta;
-        if (newIndex >= 0) {
-            if (newIndex >= this.pages.length) {
-                this.pages.push("");
-            }
-            this.currentPage = newIndex;
-            this.renderPage();
-        }
-    },
-
-    renderPage() {
-        const textarea = document.getElementById('notebookContent');
-        const indicator = document.getElementById('pageIndicator');
-        textarea.value = this.pages[this.currentPage] || "";
-        indicator.textContent = `Pg ${this.currentPage + 1}`;
-    }
-};
-
-function setupNotebook() {
-    NotebookManager.init();
-}
 
 // SETTINGS MANAGER (Dark Mode, Themes, Fonts)
 const SettingsManager = {

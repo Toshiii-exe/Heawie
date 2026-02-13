@@ -125,7 +125,7 @@ function init() {
     setupControls();
     TimerManager.init(); // Initialize Timer
     TodoManager.init();  // Initialize Todos
-    NotebookManager.init();
+
     startClock();
 
     // DELAY Start: Idle words only start 3 seconds after opening
@@ -218,123 +218,7 @@ function setWallpaper(wallpaper, customBase64 = null) {
 
 
 // ===== NOTEBOOK MANAGER =====
-const NotebookManager = {
-    pages: ["", "", "", "", ""], // 5 pages by default
-    currentPage: 0,
-    isOpen: false,
 
-    init() {
-        this.load();
-        this.setupUI();
-    },
-
-    load() {
-        const saved = localStorage.getItem('heartbeat_notebook');
-        if (saved) {
-            try {
-                this.pages = JSON.parse(saved);
-                if (!Array.isArray(this.pages) || this.pages.length === 0) {
-                    this.pages = [""];
-                }
-            } catch (e) {
-                this.pages = [""];
-            }
-        }
-    },
-
-    save() {
-        // Save current page content to array first
-        const textarea = document.getElementById('notebookContent');
-        if (textarea) {
-            this.pages[this.currentPage] = textarea.value;
-        }
-        localStorage.setItem('heartbeat_notebook', JSON.stringify(this.pages));
-    },
-
-    setupUI() {
-        const toggleBtn = document.getElementById('notebookToggle');
-        const overlay = document.getElementById('notebookOverlay');
-        const closeBtn = document.getElementById('closeNotebook');
-        const textarea = document.getElementById('notebookContent');
-        const prevBtn = document.getElementById('prevPage');
-        const nextBtn = document.getElementById('nextPage');
-        const dateDisplay = document.getElementById('notebookDate');
-
-        // Toggle Open/Close
-        if (toggleBtn) {
-            toggleBtn.addEventListener('click', () => this.open());
-        }
-
-        if (closeBtn) {
-            closeBtn.addEventListener('click', () => this.close());
-        }
-
-        if (overlay) {
-            overlay.addEventListener('click', (e) => {
-                if (e.target === overlay) this.close();
-            });
-        }
-
-        // Auto-save on input
-        if (textarea) {
-            textarea.addEventListener('input', () => this.save());
-        }
-
-        // Pagination
-        if (prevBtn) {
-            prevBtn.addEventListener('click', () => this.changePage(-1));
-        }
-        if (nextBtn) {
-            nextBtn.addEventListener('click', () => this.changePage(1));
-        }
-
-        // Key bindings
-        document.addEventListener('keydown', (e) => {
-            if (this.isOpen && e.key === 'Escape') this.close();
-        });
-
-        // Set Date
-        if (dateDisplay) {
-            const options = { weekday: 'long', month: 'short', day: 'numeric' };
-            dateDisplay.textContent = new Date().toLocaleDateString('en-US', options);
-        }
-    },
-
-    open() {
-        this.isOpen = true;
-        document.getElementById('notebookOverlay').classList.add('active');
-        this.renderPage();
-    },
-
-    close() {
-        this.isOpen = false;
-        document.getElementById('notebookOverlay').classList.remove('active');
-        this.save();
-    },
-
-    changePage(delta) {
-        // Save current before switching
-        this.save();
-
-        const newIndex = this.currentPage + delta;
-        if (newIndex >= 0) {
-            // Expand pages if needed
-            if (newIndex >= this.pages.length) {
-                this.pages.push("");
-            }
-            this.currentPage = newIndex;
-            this.renderPage();
-        }
-    },
-
-    renderPage() {
-        const textarea = document.getElementById('notebookContent');
-        const indicator = document.getElementById('pageIndicator');
-
-        textarea.value = this.pages[this.currentPage] || "";
-        indicator.textContent = `Pg ${this.currentPage + 1}`;
-    }
-};
 
 // ===== DYNAMIC SECRET MESSAGE FETCHING =====
 async function fetchSecretMessages() {
