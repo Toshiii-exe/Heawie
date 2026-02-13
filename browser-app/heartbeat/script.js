@@ -125,7 +125,8 @@ function init() {
     setupControls();
     TimerManager.init(); // Initialize Timer
     TodoManager.init();  // Initialize Todos
-
+    TimerManager.init(); // Initialize Timer
+    TodoManager.init();  // Initialize Todos
     startClock();
 
     // DELAY Start: Idle words only start 3 seconds after opening
@@ -220,6 +221,9 @@ function setWallpaper(wallpaper, customBase64 = null) {
 // ===== NOTEBOOK MANAGER =====
 
 
+// ===== NOTEBOOK MANAGER =====
+
+
 // ===== DYNAMIC SECRET MESSAGE FETCHING =====
 async function fetchSecretMessages() {
     try {
@@ -269,19 +273,20 @@ function renderSecretContent() {
         return;
     }
 
-    // Sequential Mode Implementation: Start from a fixed date
-    const startDate = new Date('2026-02-14T00:00:00'); // User requested to start on Feb 14
+    // Sequential Mode Implementation: Start from a fixed date (Feb 14, 2026)
+    const startDate = new Date('2026-02-14T00:00:00');
     const now = new Date();
 
     // Calculate days passed since start date
+    // Math.floor ensures the index changes exactly at midnight local time
     const diffTime = now - startDate;
     const dayIndex = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
     if (dayIndex >= 0) {
         // We have messages!
-        const message = secretMessageData.messages[dayIndex];
-
-        if (message) {
+        // Ensure we don't go out of bounds
+        if (dayIndex < secretMessageData.messages.length) {
+            const message = secretMessageData.messages[dayIndex];
             const { title, paragraphs, signature } = message;
             let html = `<h2>${title}</h2>`;
             paragraphs.forEach(para => {
@@ -291,20 +296,24 @@ function renderSecretContent() {
             secretContentDiv.innerHTML = html;
             messageStatus.textContent = '';
         } else {
-            // Out of messages
+            // Out of messages (after all configured days passed)
+            // We can either loop or show a 'wait for more' message.
+            // Let's loop for now to keep it active, or show the last one?
+            // User asked for "messages for two months", if we run out, let's show a generic sweet one.
             secretContentDiv.innerHTML = `
-                <h2>To be continued... ❤️</h2>
-                <p class="secret-message">Every heartbeat brings us closer. Check back soon for more secrets.</p>
-                <div class="secret-signature">— Always yours</div>
-            `;
+                 <h2>To be continued... ❤️</h2>
+                 <p class="secret-message">Every day with you is a new page. I'll write more here soon. For now, just know I love you.</p>
+                 <div class="secret-signature">— Always yours</div>
+             `;
             messageStatus.textContent = '';
         }
     } else {
-        // Not yet Feb 13
+        // BEFORE Feb 14 (e.g., Today Feb 13)
+        // Show a "Wait for it" message
         secretContentDiv.innerHTML = `
-            <h2>Hearts in Sync... ❤️</h2>
-            <p class="secret-message">The heartbeat is counting down. Your secret journey officially begins on Valentine's Day.</p>
-            <div class="secret-signature">— Always yours</div>
+            <h2>SOON... ⏳</h2>
+            <p class="secret-message">The secret notes begin on Valentine's Day. Come back tomorrow, my love.</p>
+            <div class="secret-signature">— Your Secret Keeper</div>
         `;
         messageStatus.textContent = '';
     }

@@ -80,6 +80,7 @@
         </div>
     </div>
 
+    <!-- Left Sidebar (Notebook) -->
     <!-- Right Sidebar Actions (Global) -->
     <div class="right-sidebar">
         <!-- Settings Toggle -->
@@ -87,12 +88,34 @@
             <span class="icon">⚙️</span>
         </button>
 
-
-
         <!-- Bookmarks Toggle -->
         <button class="control-btn" id="bookmarksToggle" title="Liked Pages" aria-label="Open Bookmarks">
             <span class="icon">❤️</span>
         </button>
+
+        <!-- Notebook Toggle -->
+        <button class="control-btn" id="notebookToggle" title="Notebook" aria-label="Open Notebook">
+            <span class="icon">📓</span>
+        </button>
+    </div>
+
+    <!-- Notebook Overlay -->
+    <div class="notebook-overlay" id="notebookOverlay">
+        <div class="notebook-panel">
+            <div class="notebook-header">
+                <div class="notebook-title">
+                    <span id="notebookDate">Monday, Jan 1</span>
+                    <span id="pageIndicator" class="page-num">Pg 1</span>
+                </div>
+                <button class="close-modal-btn" id="closeNotebook">&times;</button>
+            </div>
+            <textarea id="notebookContent" placeholder="Write something from the heart..."></textarea>
+            <div class="notebook-footer">
+                <button id="prevPage" class="nav-btn">Previous</button>
+                <div class="notebook-decor">🫀</div>
+                <button id="nextPage" class="nav-btn">Next Page</button>
+            </div>
+        </div>
     </div>
 
     <!-- Settings Overlay -->

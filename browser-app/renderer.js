@@ -447,8 +447,152 @@ document.addEventListener('DOMContentLoaded', init);
 function setupGlobalUI() {
 
     BookmarksManager.init();
+    NotebookManager.init(); // Initialize Notebook
     SettingsManager.init();
 }
+
+// NOTEBOOK MANAGER
+const NotebookManager = {
+    pages: ["", "", "", "", ""], // 5 pages by default
+    currentPage: 0,
+    isOpen: false,
+
+    init() {
+        this.load();
+        this.setupUI();
+    },
+
+    load() {
+        const saved = localStorage.getItem('heawie_notebook');
+        if (saved) {
+            try {
+                this.pages = JSON.parse(saved);
+                if (!Array.isArray(this.pages) || this.pages.length === 0) {
+                    this.pages = [""];
+                }
+            } catch (e) {
+                this.pages = [""];
+            }
+        }
+    },
+
+    save() {
+        // Save current page content to array first
+        const textarea = document.getElementById('notebookContent');
+        if (textarea) {
+            this.pages[this.currentPage] = textarea.value;
+        }
+        localStorage.setItem('heawie_notebook', JSON.stringify(this.pages));
+    },
+
+    setupUI() {
+        const toggleBtn = document.getElementById('notebookToggle');
+        const overlay = document.getElementById('notebookOverlay');
+        const closeBtn = document.getElementById('closeNotebook');
+        const textarea = document.getElementById('notebookContent');
+        const prevBtn = document.getElementById('prevPage');
+        const nextBtn = document.getElementById('nextPage');
+        const dateDisplay = document.getElementById('notebookDate');
+
+        // Toggle Open/Close
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                if (this.isOpen) this.close();
+                else this.open();
+            });
+        }
+
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => this.close());
+        }
+
+        if (overlay) {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) this.close();
+            });
+        }
+
+        // Auto-save on input
+        if (textarea) {
+            textarea.addEventListener('input', () => this.save());
+        }
+
+        // Pagination
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => this.changePage(-1));
+        }
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => this.changePage(1));
+        }
+
+        // Key bindings
+        document.addEventListener('keydown', (e) => {
+            if (this.isOpen && e.key === 'Escape') this.close();
+        });
+
+        // Set Date
+        if (dateDisplay) {
+            const options = { weekday: 'long', month: 'short', day: 'numeric' };
+            dateDisplay.textContent = new Date().toLocaleDateString('en-US', options);
+        }
+    },
+
+    open() {
+        this.isOpen = true;
+        const overlay = document.getElementById('notebookOverlay');
+        if (overlay) overlay.classList.add('active');
+        this.renderPage();
+    },
+
+    close() {
+        this.isOpen = false;
+        const overlay = document.getElementById('notebookOverlay');
+        if (overlay) overlay.classList.remove('active');
+        this.save();
+    },
+
+    changePage(delta) {
+        // Save current before switching
+        this.save();
+
+        const newIndex = this.currentPage + delta;
+
+        // Prevent going below page 0
+        if (newIndex < 0) return;
+
+        // If trying to go past the last page, create a new one automatically
+        if (newIndex >= this.pages.length) {
+            this.pages.push("");
+        }
+
+        this.currentPage = newIndex;
+        this.renderPage();
+    },
+
+    renderPage() {
+        const textarea = document.getElementById('notebookContent');
+        const indicator = document.getElementById('pageIndicator');
+        const prevBtn = document.getElementById('prevPage');
+        const nextBtn = document.getElementById('nextPage');
+
+        if (textarea) textarea.value = this.pages[this.currentPage] || "";
+
+        // Update Page Number
+        if (indicator) indicator.textContent = `PAGE ${this.currentPage + 1}`;
+
+        // Update Button States
+        if (prevBtn) {
+            prevBtn.disabled = (this.currentPage === 0);
+            prevBtn.style.opacity = (this.currentPage === 0) ? "0.3" : "1";
+            prevBtn.style.pointerEvents = (this.currentPage === 0) ? "none" : "auto";
+        }
+
+        // Next button is always enabled as it creates new pages
+        if (nextBtn) {
+            nextBtn.textContent = (this.currentPage === this.pages.length - 1) ? "New Page" : "Next Page";
+        }
+    }
+};
 
 
 

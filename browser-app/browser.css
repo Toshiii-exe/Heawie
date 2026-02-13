@@ -849,3 +849,253 @@ body.light-mode .bookmark-action-btn.active {
         margin: 10px;
     }
 }
+
+
+
+/* ===== NOTEBOOK INTERFACE ===== */
+.notebook-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.4s ease;
+}
+
+.notebook-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.notebook-panel {
+    width: 550px;
+    max-width: 90%;
+    height: 75vh;
+    background-color: #1e1e24;
+    /* Dark Paper Color */
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 107, 157, 0.2) 1px, transparent 1px);
+    background-size: 100% 2rem, 100% 100%;
+    background-position: 0 1.95rem, 3rem 0;
+    background-repeat: repeat-y, no-repeat;
+    border-radius: 12px;
+    box-shadow:
+        0 0 0 8px rgba(255, 255, 255, 0.02),
+        /* Outer Rim */
+        0 20px 50px rgba(0, 0, 0, 0.5),
+        /* Drop Shadow */
+        inset 40px 0 60px rgba(0, 0, 0, 0.2);
+    /* Spine Shadow */
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    transform: perspective(1000px) rotateX(10deg) translateY(50px) scale(0.9);
+    transform-origin: top center;
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+}
+
+/* Spiral Binding Look (Optional - using left border/shadow) */
+.notebook-panel::before {
+    content: '';
+    position: absolute;
+    left: 10px;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: repeating-linear-gradient(to bottom,
+            #333 0px,
+            #333 10px,
+            transparent 10px,
+            transparent 20px);
+    z-index: 5;
+    opacity: 0.3;
+}
+
+.notebook-overlay.active .notebook-panel {
+    transform: perspective(1000px) rotateX(0deg) translateY(0) scale(1);
+    opacity: 1;
+}
+
+body.light-mode .notebook-panel {
+    background-color: #fffdf6;
+    /* Cream Paper */
+    background-image:
+        linear-gradient(#e1e1e1 1px, transparent 1px),
+        /* Blue-ish rule */
+        linear-gradient(90deg, rgba(255, 100, 100, 0.3) 1px, transparent 1px);
+    /* Red Margin */
+    color: #333;
+    border-color: #d1d1d1;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15), inset 30px 0 50px rgba(0, 0, 0, 0.02);
+}
+
+.notebook-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 2.5rem 3rem 1rem 4rem;
+    /* Left padding accounts for margin line */
+}
+
+.notebook-title {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.notebook-title span:first-child {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.8rem;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1;
+}
+
+body.light-mode .notebook-title span:first-child {
+    color: #2c3e50;
+}
+
+.page-num {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.7rem;
+    color: #ff9eb7;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    opacity: 0.8;
+}
+
+#notebookContent {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.85);
+    font-family: 'Coming Soon', 'Patrick Hand', 'Outfit', cursive, sans-serif;
+    /* Handwriting fallback */
+    font-size: 1.15rem;
+    line-height: 2rem;
+    /* Must match background size height */
+    resize: none;
+    outline: none;
+    padding: 0 2rem 0 4rem;
+    /* Align with margin */
+    margin-top: 1px;
+    /* Fine tune alignment */
+}
+
+body.light-mode #notebookContent {
+    color: #2c3e50;
+}
+
+/* Scrollbar hidden mainly, or thin */
+#notebookContent::-webkit-scrollbar {
+    width: 4px;
+}
+
+#notebookContent::-webkit-scrollbar-thumb {
+    background: rgba(255, 107, 157, 0.3);
+    border-radius: 4px;
+}
+
+.notebook-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 3rem 1.5rem 4rem;
+}
+
+.notebook-decor {
+    font-size: 1.2rem;
+    opacity: 0.6;
+    animation: decorPulse 2s infinite ease-in-out;
+}
+
+@keyframes decorPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 0.9;
+    }
+}
+
+.close-notebook {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.close-notebook:hover {
+    color: #ff6b6b;
+    transform: rotate(90deg);
+}
+
+body.light-mode .close-notebook {
+    color: rgba(0, 0, 0, 0.2);
+}
+
+
+/* Notebook Navigation Buttons */
+.notebook-footer .nav-btn {
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: auto;
+    /* Reset width from global .nav-btn if set */
+    height: auto;
+    /* Reset height from global .nav-btn if set */
+    display: inline-flex;
+    /* Ensure flex display */
+    align-items: center;
+    justify-content: center;
+}
+
+.notebook-footer .nav-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+    box-shadow: none;
+    /* Remove global shadow if any */
+}
+
+.notebook-footer .nav-btn:disabled {
+    opacity: 0.3;
+    pointer-events: none;
+    border-color: transparent;
+}
+
+body.light-mode .notebook-footer .nav-btn {
+    border-color: rgba(0, 0, 0, 0.1);
+    color: rgba(0, 0, 0, 0.5);
+}
+
+body.light-mode .notebook-footer .nav-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: #000;
+    border-color: rgba(0, 0, 0, 0.3);
+}
