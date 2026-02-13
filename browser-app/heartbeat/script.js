@@ -12,7 +12,9 @@ const CONFIG = {
         "quietly alive", "calm inside", "no rush", "unguarded", "familiar silence",
         "slow moments", "shared quiet", "settled", "breathing light", "resting pulse",
         "gentle time", "warmth returns", "anchored", "held gently", "ease", "unspoken calm",
-        "peaceful weight", "settled heart", "steady glow", "nothing loud", "just here", "home again"
+        "peaceful weight", "settled heart", "steady glow", "nothing loud", "just here", "home again",
+        "soft whispers", "kindred", "starlit peace", "hidden joy", "simply us", "dreamy quiet",
+        "inner light", "tender heart", "quietly yours", "safe harbor", "gentle drift", "soul rest"
     ],
 
     // CLICK heart state - intimate messages on each click
@@ -25,7 +27,9 @@ const CONFIG = {
         "my quiet joy", "you calm me", "my gravity", "my anchor", "my light", "my reason",
         "you're safe with me", "you're loved", "I hold you", "my home", "always close",
         "my constant place", "my heartbeat chose you", "us", "together", "just us", "you're mine",
-        "my comfort person", "I feel you", "my soul knows", "we're aligned", "always connected", "my heart stays"
+        "my comfort person", "I feel you", "my soul knows", "we're aligned", "always connected", "my heart stays",
+        "you are my dream", "endlessly yours", "my soul's echo", "light of my life", "my heartbeat's song",
+        "beyond the stars", "my only one", "forever in sync", "you are enough", "simply beautiful", "you move me"
     ],
 
     idleWordDuration: 4000, // How long each idle word stays (4 seconds)
