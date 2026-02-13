@@ -51,6 +51,34 @@
                 <button id="addTodoBtn">+</button>
             </div>
         </div>
+        <!-- Notebook Widget -->
+        <div class="widget-card notebook-widget">
+            <div class="widget-header">
+                <span>📓 Notebook</span>
+            </div>
+            <p style="font-size: 0.8rem; opacity: 0.7; margin-bottom: 10px;">Your private thoughts, stored locally.</p>
+            <button id="notebookToggle" class="timer-btn">Open Notes</button>
+        </div>
+    </div>
+
+
+    <!-- Notebook Overlay -->
+    <div class="notebook-overlay" id="notebookOverlay">
+        <div class="notebook-container">
+            <div class="notebook-header">
+                <div class="notebook-title">
+                    <span id="notebookDate">Monday, Jan 1</span>
+                    <span id="pageIndicator" class="page-num">Pg 1</span>
+                </div>
+                <button class="close-notebook" id="closeNotebook">&times;</button>
+            </div>
+            <textarea id="notebookContent" placeholder="Write something from the heart..."></textarea>
+            <div class="notebook-footer">
+                <button id="prevPage" class="nav-btn">Previous</button>
+                <div class="notebook-decor">🫀</div>
+                <button id="nextPage" class="nav-btn">Next Page</button>
+            </div>
+        </div>
     </div>
 
 
