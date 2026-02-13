@@ -830,6 +830,7 @@ function setupLockClick() {
             if (secretArea) {
                 secretArea.classList.remove('visible');
             }
+            document.body.classList.remove('secret-active');
 
             saveUserPreferences();
             console.log('🔒 Secret area relocked');
@@ -885,6 +886,17 @@ function setupUnlockModal() {
             closeModal();
         }
     });
+
+    // Hide secret area button
+    const hideSecretBtn = document.getElementById('hideSecret');
+    if (hideSecretBtn) {
+        hideSecretBtn.addEventListener('click', () => {
+            if (secretArea) {
+                secretArea.classList.remove('visible');
+            }
+            document.body.classList.remove('secret-active');
+        });
+    }
 }
 
 function closeModal() {
@@ -915,6 +927,7 @@ function checkSecret() {
         if (secretArea) {
             setTimeout(() => {
                 secretArea.classList.add('visible');
+                document.body.classList.add('secret-active');
             }, 500);
         }
     } else {

@@ -1072,6 +1072,40 @@ body.breathing-active .header-container {
     transform: translateY(0);
 }
 
+.secret-back-btn {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    /* Moved to right to avoid interference */
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    padding: 0.8rem 1.5rem;
+    border-radius: 50px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    z-index: 210;
+}
+
+.secret-back-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    border-color: var(--accent-color);
+    transform: translateX(5px);
+}
+
+.secret-back-btn svg {
+    transition: transform 0.3s ease;
+}
+
+.secret-back-btn:hover svg {
+    transform: translateX(3px);
+}
+
 
 /* ===== 10. COLOR THEMES (Overrides) ===== */
 /* Aurora (Default) */
@@ -1464,13 +1498,19 @@ body[data-wallpaper="rainbow"] {
     display: none !important;
 }
 
-/* Hide sidebar and other UI when breathing */
+/* Hide main elements when breathing or in secret area */
 body.breathing-active .heart-container,
 body.breathing-active .message-container,
 body.breathing-active .idle-word,
 body.breathing-active .search-container,
 body.breathing-active .widget-sidebar,
-body.breathing-active .header-container {
+body.breathing-active .header-container,
+body.secret-active .heart-container,
+body.secret-active .message-container,
+body.secret-active .idle-word,
+body.secret-active .search-container,
+body.secret-active .widget-sidebar,
+body.secret-active .header-container {
     opacity: 0;
     pointer-events: none;
     transition: opacity 1s ease;

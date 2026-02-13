@@ -78,6 +78,22 @@ function setupNavigationControls() {
             });
         }
     });
+
+    // Bookmark Current Page
+    const bookmarkCurrentBtn = document.getElementById('bookmarkCurrentBtn');
+    if (bookmarkCurrentBtn) {
+        bookmarkCurrentBtn.addEventListener('click', () => {
+            const wv = TabManager.getActiveWebview();
+            if (wv) {
+                const url = wv.getURL();
+                const title = wv.getTitle();
+                // Simple favicon fetch
+                const domain = new URL(url).hostname;
+                const icon = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+                BookmarksManager.toggle(title, url, icon);
+            }
+        });
+    }
 }
 
 // Navigate based on user input
@@ -266,6 +282,13 @@ function updateNavigationButtons() {
             backBtn.disabled = !wv.canGoBack();
             forwardBtn.disabled = !wv.canGoForward();
             updateGlobalControlsState();
+
+            // Update Bookmark Button state
+            const bookmarkCurrentBtn = document.getElementById('bookmarkCurrentBtn');
+            if (bookmarkCurrentBtn) {
+                const isBookmarked = BookmarksManager.isBookmarked(wv.getURL());
+                bookmarkCurrentBtn.classList.toggle('active', isBookmarked);
+            }
         } catch (e) { }
     }
 }
@@ -291,11 +314,149 @@ async function updateGlobalControlsState() {
 }
 
 // Initialize when DOM is ready
+// BOOKMARKS MANAGER
+const BookmarksManager = {
+    bookmarks: [],
+    isOpen: false,
+
+    init() {
+        this.load();
+        this.setupUI();
+    },
+
+    load() {
+        const saved = localStorage.getItem('heawie_bookmarks');
+        if (saved) {
+            try {
+                this.bookmarks = JSON.parse(saved);
+            } catch (e) {
+                this.bookmarks = [];
+            }
+        }
+    },
+
+    save() {
+        localStorage.setItem('heawie_bookmarks', JSON.stringify(this.bookmarks));
+        this.render();
+        // Update nav button state if active
+        const wv = TabManager.getActiveWebview();
+        if (wv) {
+            const bookmarkCurrentBtn = document.getElementById('bookmarkCurrentBtn');
+            if (bookmarkCurrentBtn) {
+                bookmarkCurrentBtn.classList.toggle('active', this.isBookmarked(wv.getURL()));
+            }
+        }
+    },
+
+    setupUI() {
+        const toggleBtn = document.getElementById('bookmarksToggle');
+        const overlay = document.getElementById('bookmarksOverlay');
+        const closeBtn = document.getElementById('closeBookmarks');
+
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                if (this.isOpen) this.close();
+                else this.open();
+            });
+        }
+
+        if (closeBtn) closeBtn.addEventListener('click', () => this.close());
+
+        if (overlay) {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) this.close();
+            });
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (this.isOpen && e.key === 'Escape') this.close();
+        });
+    },
+
+    open() {
+        this.isOpen = true;
+        document.getElementById('bookmarksOverlay').classList.add('active');
+        this.render();
+    },
+
+    close() {
+        this.isOpen = false;
+        document.getElementById('bookmarksOverlay').classList.remove('active');
+    },
+
+    toggle(title, url, icon) {
+        if (url.startsWith('file://') && url.includes('heartbeat/index.html')) return; // Don't bookmark home
+
+        const index = this.bookmarks.findIndex(b => b.url === url);
+        if (index > -1) {
+            this.bookmarks.splice(index, 1);
+        } else {
+            this.bookmarks.push({ title, url, icon });
+        }
+        this.save();
+    },
+
+    remove(url) {
+        this.bookmarks = this.bookmarks.filter(b => b.url !== url);
+        this.save();
+    },
+
+    isBookmarked(url) {
+        return this.bookmarks.some(b => b.url === url);
+    },
+
+    render() {
+        const list = document.getElementById('bookmarksList');
+        if (!list) return;
+
+        if (this.bookmarks.length === 0) {
+            list.innerHTML = '<div class="empty-state">No liked pages yet. Click the heart in the address bar to save one!</div>';
+            return;
+        }
+
+        list.innerHTML = '';
+        this.bookmarks.forEach(b => {
+            const item = document.createElement('div');
+            item.className = 'bookmark-item-wrapper'; // Need a wrapper for delete button positioning if desired
+
+            const a = document.createElement('a');
+            a.className = 'bookmark-item';
+            a.href = '#';
+            a.innerHTML = `
+                <div class="bookmark-icon">
+                    <img src="${b.icon}" width="20" height="20" onerror="this.src='https://cdn.pixabay.com/photo/2016/02/04/11/57/heart-1179054_1280.png'">
+                </div>
+                <div class="bookmark-info">
+                    <span class="bookmark-title">${b.title || 'Untitled'}</span>
+                    <span class="bookmark-url">${b.url}</span>
+                </div>
+                <button class="bookmark-delete" title="Remove">&times;</button>
+            `;
+
+            a.addEventListener('click', (e) => {
+                if (e.target.classList.contains('bookmark-delete')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.remove(b.url);
+                    return;
+                }
+                e.preventDefault();
+                const wv = TabManager.getActiveWebview();
+                if (wv) wv.loadURL(b.url);
+                this.close();
+            });
+
+            list.appendChild(a);
+        });
+    }
+};
+
 document.addEventListener('DOMContentLoaded', init);
 
 // ===== GLOBAL UI FEATURES (Notebook & Settings) =====
 function setupGlobalUI() {
     setupNotebook();
+    BookmarksManager.init();
     SettingsManager.init();
 }
 
