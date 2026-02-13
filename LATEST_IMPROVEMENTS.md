@@ -13,11 +13,24 @@ Added a built-in **Box Breathing** visual aid.
 - **Visual**: A glowing ring expands (inhale) and contracts (exhale) in a soothing 8-second cycle.
 - **Purpose**: Helps sync your own heartbeat with the app's rhythm.
 
-## 3. Premium Browser UI 🖥️
+## 3. Productivity Widgets (Sidebar) 🗂️
+Added a subtle, glassmorphism-style sidebar on the left for quick tools.
+- **Timer**: Organic countdown timer with presets and custom minutes.
+- **To-Do List**: Simple, persistent task manager to keep your thoughts organized.
+- **Interaction**: Widgets stay dimmed (30% opacity) until you hover over the sidebar, keeping the focus on the heart.
+
+## 4. Liked Sites: Double Shortcut System 🔗
+We've implemented a comprehensive way to keep your favorite places close:
+- **Browser Bookmarks (Top-Right ❤️)**: Save any website as a "Liked Page" in the browser frame.
+- **Speed Dial (Search Bar area)**: Hover over the search bar to reveal a grid of your most-used sites (YouTube, Spotify, ChatGPT, etc.).
+- **Easy Customization**: Click the "+" button in the Speed Dial to add your own secret shortcuts with automatic icons.
+
+## 5. Premium Browser UI 🖥️
 Upgraded the Windows Browser App (`browser-app/`) to match the "Heartbeat" aesthetic.
 - **Glassmorphism**: Address bar and logic are now translucent and blurred.
 - **Premium Buttons**: Hover effects with glow and smooth scaling.
 - **Deep Background**: Matches the cosmic theme of the main app.
+- **Tab System**: Full multi-tab support with smooth transitions.
 
 ## ℹ️ How to Test
 1. **Open `index.html`**.
