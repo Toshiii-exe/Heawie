@@ -132,6 +132,7 @@ function init() {
 // ===== LOCAL STORAGE PERSISTENCE =====
 function loadUserPreferences() {
     const savedWallpaper = localStorage.getItem('heartbeat_wallpaper');
+    const savedCustomWallpaper = localStorage.getItem('heartbeat_custom_wallpaper');
     const savedUnlocked = localStorage.getItem('heartbeat_unlocked');
     const savedClickIndex = localStorage.getItem('heartbeat_click_index');
 
@@ -152,10 +153,16 @@ function loadUserPreferences() {
             currentClickMessageIndex = index;
         }
     }
+
+    // Apply wallpaper (including custom)
+    setWallpaper(currentWallpaper, savedCustomWallpaper);
 }
 
-function saveUserPreferences() {
+function saveUserPreferences(customBase64 = null) {
     localStorage.setItem('heartbeat_wallpaper', currentWallpaper);
+    if (currentWallpaper === 'custom' && customBase64) {
+        localStorage.setItem('heartbeat_custom_wallpaper', customBase64);
+    }
     localStorage.setItem('heartbeat_unlocked', isUnlocked.toString());
     localStorage.setItem('heartbeat_click_index', currentClickMessageIndex.toString());
 }
@@ -222,8 +229,13 @@ function setupWallpaperSelector() {
     NotebookManager.init();
 }
 
-function setWallpaper(wallpaper) {
-    const url = CONFIG.wallpapers[wallpaper];
+function setWallpaper(wallpaper, customBase64 = null) {
+    let url = CONFIG.wallpapers[wallpaper];
+
+    // Support custom local pictures
+    if (wallpaper === 'custom' && customBase64) {
+        url = customBase64;
+    }
 
     // Set body attribute for CSS theme changes
     document.body.setAttribute('data-wallpaper', wallpaper);
@@ -232,7 +244,7 @@ function setWallpaper(wallpaper) {
         // Set as background image
         backgroundContainer.style.backgroundImage = `url('${url}')`;
     } else {
-        // Fallback to solid color
+        // Fallback or empty
         backgroundContainer.style.backgroundImage = 'none';
     }
 }
@@ -415,30 +427,41 @@ function renderSecretContent() {
         return;
     }
 
-    // Daily Mode Implementation: Find a message that matches TODAY's date
+    // Sequential Mode Implementation: Start from a fixed date
+    const startDate = new Date('2026-02-14T00:00:00'); // User requested to start on Feb 14
     const now = new Date();
-    const todayStr = now.toISOString().split('T')[0]; // Format: YYYY-MM-DD
 
-    // Find the message for today
-    const todayMessage = secretMessageData.messages.find(m => {
-        // Check if timestamp is exactly today's date string
-        return m.timestamp === todayStr;
-    });
+    // Calculate days passed since start date
+    const diffTime = now - startDate;
+    const dayIndex = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-    if (todayMessage) {
-        const { title, paragraphs, signature } = todayMessage;
-        let html = `<h2>${title}</h2>`;
-        paragraphs.forEach(para => {
-            html += `<p class="secret-message">${para}</p>`;
-        });
-        html += `<div class="secret-signature">${signature}</div>`;
-        secretContentDiv.innerHTML = html;
-        messageStatus.textContent = '';
+    if (dayIndex >= 0) {
+        // We have messages!
+        const message = secretMessageData.messages[dayIndex];
+
+        if (message) {
+            const { title, paragraphs, signature } = message;
+            let html = `<h2>${title}</h2>`;
+            paragraphs.forEach(para => {
+                html += `<p class="secret-message">${para}</p>`;
+            });
+            html += `<div class="secret-signature">${signature}</div>`;
+            secretContentDiv.innerHTML = html;
+            messageStatus.textContent = '';
+        } else {
+            // Out of messages
+            secretContentDiv.innerHTML = `
+                <h2>To be continued... ❤️</h2>
+                <p class="secret-message">Every heartbeat brings us closer. Check back soon for more secrets.</p>
+                <div class="secret-signature">— Always yours</div>
+            `;
+            messageStatus.textContent = '';
+        }
     } else {
-        // No message for today: Show waiting screen
+        // Not yet Feb 13
         secretContentDiv.innerHTML = `
-            <h2>Check back tomorrow... ❤️</h2>
-            <p class="secret-message">There isn't a new message for today yet, but the heartbeat is still here for you.</p>
+            <h2>Hearts in Sync... ❤️</h2>
+            <p class="secret-message">The heartbeat is counting down. Your secret journey officially begins on Valentine's Day.</p>
             <div class="secret-signature">— Always yours</div>
         `;
         messageStatus.textContent = '';
@@ -559,10 +582,19 @@ function setupSearchBar() {
 
     searchBar.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
-            const query = searchBar.value.trim();
-            if (query) {
-                window.location.href = `https://duckduckgo.com/?q=${encodeURIComponent(query)}`;
+            let query = searchBar.value.trim();
+            if (!query) return;
+
+            const isDomain = /^[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/i.test(query);
+
+            if (!query.startsWith('http://') && !query.startsWith('https://') && !query.startsWith('file://')) {
+                if (isDomain && !query.includes(' ')) {
+                    query = 'https://' + query;
+                } else {
+                    query = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+                }
             }
+            window.location.href = query;
         }
     });
 
@@ -575,13 +607,13 @@ const ShortcutManager = {
     defaults: [
         { name: "YouTube", url: "https://youtube.com", icon: "https://cdn.simpleicons.org/youtube/FF0000" },
         { name: "Spotify", url: "https://open.spotify.com", icon: "https://cdn.simpleicons.org/spotify/1DB954" },
-        { name: "ChatGPT", url: "https://chat.openai.com", icon: "https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg" },
+        { name: "ChatGPT", url: "https://chatgpt.com", icon: "https://cdn.simpleicons.org/openai/412991" },
         { name: "Gmail", url: "https://mail.google.com", icon: "https://cdn.simpleicons.org/gmail/EA4335" },
         { name: "Netflix", url: "https://netflix.com", icon: "https://cdn.simpleicons.org/netflix/E50914" },
         { name: "Discord", url: "https://discord.com", icon: "https://cdn.simpleicons.org/discord/5865F2" },
         { name: "Reddit", url: "https://reddit.com", icon: "https://cdn.simpleicons.org/reddit/FF4500" },
         { name: "Instagram", url: "https://instagram.com", icon: "https://cdn.simpleicons.org/instagram/E4405F" },
-        { name: "Amazon", url: "https://amazon.com", icon: "https://cdn.simpleicons.org/amazon/FF9900" },
+        { name: "Prime Video", url: "https://www.primevideo.com", icon: "https://cdn.simpleicons.org/primevideo/00A8E1" },
         { name: "X", url: "https://twitter.com", icon: "https://cdn.simpleicons.org/x/000000", invert: true },
         { name: "GitHub", url: "https://github.com", icon: "https://cdn.simpleicons.org/github/181717", invert: true },
         { name: "Twitch", url: "https://twitch.tv", icon: "https://cdn.simpleicons.org/twitch/9146FF" }
@@ -598,7 +630,13 @@ const ShortcutManager = {
         const saved = localStorage.getItem('heartbeat_shortcuts');
         if (saved) {
             try {
-                this.items = JSON.parse(saved);
+                let items = JSON.parse(saved);
+                // Migration: Update Amazon to Prime Video and fix old URLs
+                this.items = items.map(item => {
+                    if (item.name === "Amazon") return this.defaults.find(d => d.name === "Prime Video");
+                    if (item.name === "ChatGPT") return this.defaults.find(d => d.name === "ChatGPT");
+                    return item;
+                });
             } catch (e) {
                 this.items = [...this.defaults];
             }
@@ -645,7 +683,21 @@ const ShortcutManager = {
             const img = document.createElement('img');
             img.src = item.icon;
             img.alt = item.name;
-            if (item.invert) img.style.filter = "invert(1)";
+
+            // Robust Fallback: if SimpleIcons or others fail, use Google Favicon API
+            img.onerror = () => {
+                try {
+                    const domain = new URL(item.url).hostname;
+                    img.src = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+                } catch (e) {
+                    img.src = 'https://www.google.com/s2/favicons?domain=amazon.com&sz=64'; // Extreme fallback
+                }
+                img.onerror = null;
+            };
+
+            if (item.invert) {
+                img.classList.add('invert-icon');
+            }
 
             const span = document.createElement('span');
             span.textContent = item.name;
@@ -778,6 +830,7 @@ function setupLockClick() {
             if (secretArea) {
                 secretArea.classList.remove('visible');
             }
+            document.body.classList.remove('secret-active');
 
             saveUserPreferences();
             console.log('🔒 Secret area relocked');
@@ -833,6 +886,17 @@ function setupUnlockModal() {
             closeModal();
         }
     });
+
+    // Hide secret area button
+    const hideSecretBtn = document.getElementById('hideSecret');
+    if (hideSecretBtn) {
+        hideSecretBtn.addEventListener('click', () => {
+            if (secretArea) {
+                secretArea.classList.remove('visible');
+            }
+            document.body.classList.remove('secret-active');
+        });
+    }
 }
 
 function closeModal() {
@@ -863,6 +927,7 @@ function checkSecret() {
         if (secretArea) {
             setTimeout(() => {
                 secretArea.classList.add('visible');
+                document.body.classList.add('secret-active');
             }, 500);
         }
     } else {
@@ -1017,19 +1082,7 @@ const SoundManager = {
     },
 
     updateUI() {
-        const btn = document.getElementById('toggleSound');
-        const iconOff = btn.querySelector('.icon-off');
-        const iconOn = btn.querySelector('.icon-on');
-
-        if (this.isMuted) {
-            btn.classList.remove('active');
-            if (iconOff) iconOff.style.display = 'block';
-            if (iconOn) iconOn.style.display = 'none';
-        } else {
-            btn.classList.add('active');
-            if (iconOff) iconOff.style.display = 'none';
-            if (iconOn) iconOn.style.display = 'block';
-        }
+        // No dashboard UI update needed, handled by global sync
     },
 
     saveState() {
@@ -1064,17 +1117,17 @@ const SoundManager = {
     },
 
     playClick() {
-        // Soft "droplet" sound (sine waves)
-        this.playTone(300, 'sine', 0.15, 0.08);
-        this.playTone(500, 'sine', 0.1, 0.05, 0.05);
+        // Soft "droplet" sound (sine waves) - Louder
+        this.playTone(300, 'sine', 0.15, 0.15);
+        this.playTone(500, 'sine', 0.1, 0.1, 0.05);
     },
 
     playUnlock() {
-        // Magical chime (ascending major chord)
-        this.playTone(261.63, 'sine', 0.6, 0.05, 0);    // C4
-        this.playTone(329.63, 'sine', 0.6, 0.05, 0.1);  // E4
-        this.playTone(392.00, 'sine', 0.6, 0.05, 0.2);  // G4
-        this.playTone(523.25, 'sine', 1.0, 0.05, 0.3);  // C5
+        // Magical chime (ascending major chord) - Louder
+        this.playTone(261.63, 'sine', 0.6, 0.1, 0);    // C4
+        this.playTone(329.63, 'sine', 0.6, 0.1, 0.1);  // E4
+        this.playTone(392.00, 'sine', 0.6, 0.1, 0.2);  // G4
+        this.playTone(523.25, 'sine', 1.0, 0.15, 0.3);  // C5
     }
 };
 
@@ -1091,83 +1144,129 @@ function setupControls() {
         });
     }
 
-    // Breathing Toggle
-    if (toggleBreathing && breathingGuide) {
-        toggleBreathing.addEventListener('click', () => {
-            breathingGuide.classList.toggle('active');
-            document.body.classList.toggle('breathing-active'); // Toggle visibility of other elements
+    // Breathing System
+    window.BreathingMode = {
+        isActive: false,
+        toggle() {
+            this.isActive = !this.isActive;
+            const breathingGuide = document.getElementById('breathingGuide');
 
-            // Toggle button state
-            toggleBreathing.classList.toggle('active');
+            if (breathingGuide) {
+                breathingGuide.classList.toggle('active', this.isActive);
+            }
+            document.body.classList.toggle('breathing-active', this.isActive);
 
-            // If sound is on and breathing guide just became active, play a start chime
-            if (breathingGuide.classList.contains('active') && !SoundManager.isMuted) {
+            // Play sound if starting
+            if (this.isActive && typeof SoundManager !== 'undefined' && !SoundManager.isMuted) {
                 SoundManager.playClick();
             }
+
+            return this.isActive;
+        }
+    };
+
+    if (toggleBreathing) {
+        toggleBreathing.addEventListener('click', () => {
+            window.BreathingMode.toggle();
         });
     }
 }
 
-/* ===== TIMER WIDGET ===== */
+/* ===== TIMER WIDGET (Countdown) ===== */
 const TimerManager = {
     interval: null,
-    seconds: 0,
+    totalSeconds: 300, // Default 5m
+    remainingSeconds: 300,
     isRunning: false,
 
     init() {
         this.display = document.getElementById('timerDisplay');
-        this.btnStart = document.getElementById('timerToggle');
+        this.btnToggle = document.getElementById('timerToggle');
         this.btnReset = document.getElementById('timerReset');
+        this.customInput = document.getElementById('timerCustom');
+        this.presetBtns = document.querySelectorAll('.preset-btn');
 
-        if (this.btnStart) {
-            this.btnStart.addEventListener('click', () => this.toggle());
+        if (this.btnToggle) this.btnToggle.addEventListener('click', () => this.toggle());
+        if (this.btnReset) this.btnReset.addEventListener('click', () => this.reset());
+
+        if (this.customInput) {
+            this.customInput.addEventListener('change', () => {
+                const mins = parseInt(this.customInput.value);
+                if (mins > 0) this.setTime(mins * 60);
+            });
         }
-        if (this.btnReset) {
-            this.btnReset.addEventListener('click', () => this.reset());
-        }
+
+        this.presetBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const secs = parseInt(btn.dataset.time);
+                this.setTime(secs);
+            });
+        });
+
+        this.updateDisplay();
+    },
+
+    setTime(secs) {
+        this.pause();
+        this.totalSeconds = secs;
+        this.remainingSeconds = secs;
+        this.updateDisplay();
     },
 
     toggle() {
-        if (this.isRunning) {
-            this.pause();
-        } else {
-            this.start();
-        }
+        if (this.isRunning) this.pause();
+        else this.start();
     },
 
     start() {
-        if (this.isRunning) return;
+        if (this.isRunning || this.remainingSeconds <= 0) return;
         this.isRunning = true;
-        this.btnStart.textContent = 'Pause';
+        this.btnToggle.textContent = 'Pause';
+        this.display.classList.remove('finished');
+
         this.interval = setInterval(() => {
-            this.seconds++;
+            this.remainingSeconds--;
             this.updateDisplay();
+
+            if (this.remainingSeconds <= 0) {
+                this.finish();
+            }
         }, 1000);
     },
 
     pause() {
         this.isRunning = false;
-        this.btnStart.textContent = 'Start';
+        if (this.btnToggle) this.btnToggle.textContent = 'Start';
         clearInterval(this.interval);
     },
 
     reset() {
         this.pause();
-        this.seconds = 0;
+        this.remainingSeconds = this.totalSeconds;
+        this.display.classList.remove('finished');
         this.updateDisplay();
+    },
+
+    finish() {
+        this.pause();
+        this.display.classList.add('finished');
+        if (typeof SoundManager !== 'undefined' && !SoundManager.isMuted) {
+            SoundManager.playUnlock();
+        }
     },
 
     updateDisplay() {
         if (!this.display) return;
-        const h = Math.floor(this.seconds / 3600);
-        const m = Math.floor((this.seconds % 3600) / 60);
-        const s = this.seconds % 60;
+        const m = Math.floor(this.remainingSeconds / 60);
+        const s = this.remainingSeconds % 60;
+        this.display.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 
-        const hDisplay = h > 0 ? `${h}:` : '';
-        const mDisplay = String(m).padStart(2, '0');
-        const sDisplay = String(s).padStart(2, '0');
-
-        this.display.textContent = `${hDisplay}${mDisplay}:${sDisplay}`;
+        // Visual feedback when low
+        if (this.remainingSeconds < 10 && this.remainingSeconds > 0) {
+            this.display.style.color = 'var(--heart-color-end)';
+        } else {
+            this.display.style.color = '';
+        }
     }
 };
 
