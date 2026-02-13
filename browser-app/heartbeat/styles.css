@@ -249,8 +249,7 @@ body.light-mode .timer-btn:hover {
 /* ===== 4. UI HUD (Fixed Controls) ===== */
 
 /* Glass Button Base Style */
-.control-btn,
-.wallpaper-btn {
+.control-btn {
     width: 44px;
     height: 44px;
     border-radius: 12px;
@@ -268,8 +267,7 @@ body.light-mode .timer-btn:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.control-btn svg,
-.wallpaper-btn {
+.control-btn svg {
     opacity: 0.8;
     transition: opacity 0.3s;
 }
@@ -278,21 +276,18 @@ body.light-mode .timer-btn:hover {
     opacity: 1;
 }
 
-.control-btn:hover,
-.wallpaper-btn:hover {
+.control-btn:hover {
     background: rgba(255, 255, 255, 0.1);
     transform: translateY(-2px);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     border-color: rgba(255, 255, 255, 0.2);
 }
 
-.control-btn:active,
-.wallpaper-btn:active {
+.control-btn:active {
     transform: scale(0.95);
 }
 
-.control-btn.active,
-.wallpaper-btn.active {
+.control-btn.active {
     border-color: var(--accent-color);
     box-shadow: 0 0 20px var(--heart-glow);
     background: rgba(255, 255, 255, 0.15);

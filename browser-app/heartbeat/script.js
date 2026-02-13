@@ -41,7 +41,7 @@ const CONFIG = {
     minAnimationDuration: 1200, // Fastest pulse
 
     // Dynamic Secret Message Configuration
-    messagesJsonUrl: 'https://raw.githubusercontent.com/Toshiii-exe/Heawie/main/messages.json', // Path to external messages file
+    messagesJsonUrl: 'messages.json', // Path to messages file (local relative path)
     messageFetchMode: 'latest', // 'latest' or 'random'
     cacheBustParam: true, // Add timestamp to prevent caching
 
@@ -102,7 +102,7 @@ const messages = [
     document.getElementById('message2'),
     document.getElementById('message3')
 ].filter(Boolean); // Remove null elements
-const wallpaperButtons = document.querySelectorAll('.wallpaper-btn');
+
 const backgroundContainer = document.getElementById('backgroundContainer');
 const searchContainer = document.querySelector('.search-container');
 let searchTimeout = null;
@@ -112,7 +112,7 @@ function init() {
     loadUserPreferences();
     setWallpaper(currentWallpaper);
     fetchSecretMessages();
-    setupWallpaperSelector();
+
     setupTimeBasedMessages();
     setupHeartClick();
     setupLockClick();
@@ -121,10 +121,11 @@ function init() {
     setupKeyboardAccessibility();
     checkReducedMotion();
     setupSearchBar();
-    SoundManager.init();
+
     setupControls();
     TimerManager.init(); // Initialize Timer
     TodoManager.init();  // Initialize Todos
+    NotebookManager.init();
     startClock();
 
     // DELAY Start: Idle words only start 3 seconds after opening
@@ -191,48 +192,6 @@ function startClock() {
 
 
 // ===== WALLPAPER SYSTEM =====
-function setupWallpaperSelector() {
-    const themeToggle = document.getElementById('themeToggle');
-    const themeWheel = document.getElementById('themeWheel');
-    const wallpaperButtons = document.querySelectorAll('.wallpaper-btn');
-
-    // Toggle menu
-    if (themeToggle && themeWheel) {
-        themeToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            themeWheel.classList.toggle('active');
-            themeToggle.classList.toggle('active');
-        });
-
-        // Close when clicking outside
-        window.addEventListener('click', (e) => {
-            if (!themeWrapper.contains(e.target)) {
-                themeWheel.classList.remove('active');
-                themeToggle.classList.remove('active');
-            }
-        });
-    }
-
-    const themeWrapper = document.querySelector('.theme-wrapper');
-
-    updateActiveWallpaperButton();
-
-    wallpaperButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const wallpaper = btn.getAttribute('data-wallpaper');
-            if (wallpaper !== currentWallpaper) {
-                currentWallpaper = wallpaper;
-                setWallpaper(wallpaper);
-                updateActiveWallpaperButton();
-                saveUserPreferences();
-            }
-        });
-    });
-
-    // Initialize Notebook
-    NotebookManager.init();
-}
-
 function setWallpaper(wallpaper, customBase64 = null) {
     let url = CONFIG.wallpapers[wallpaper];
 
@@ -246,22 +205,17 @@ function setWallpaper(wallpaper, customBase64 = null) {
 
     if (url) {
         // Set as background image
-        backgroundContainer.style.backgroundImage = `url('${url}')`;
+        if (backgroundContainer) {
+            backgroundContainer.style.backgroundImage = `url('${url}')`;
+        }
     } else {
         // Fallback or empty
-        backgroundContainer.style.backgroundImage = 'none';
+        if (backgroundContainer) {
+            backgroundContainer.style.backgroundImage = 'none';
+        }
     }
 }
 
-function updateActiveWallpaperButton() {
-    const wallpaperButtons = document.querySelectorAll('.wallpaper-btn');
-    wallpaperButtons.forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.getAttribute('data-wallpaper') === currentWallpaper) {
-            btn.classList.add('active');
-        }
-    });
-}
 
 // ===== NOTEBOOK MANAGER =====
 const NotebookManager = {
@@ -523,7 +477,7 @@ function setupHeartClick() {
 
         // Show click message
         showClickMessage();
-        SoundManager.playClick();
+
 
         // Reset debounce after animation completes
         setTimeout(() => {
@@ -918,7 +872,7 @@ function checkSecret() {
     if (input === CONFIG.secretPassword) {
         // Correct password
         isUnlocked = true;
-        SoundManager.playUnlock();
+
         document.body.classList.add('unlocked');
         if (lockIcon) lockIcon.classList.add('unlocked');
         closeModal();
@@ -1020,7 +974,7 @@ function setupProximityEffect() {
 // ===== KEYBOARD ACCESSIBILITY =====
 function setupKeyboardAccessibility() {
     // Ensure all interactive elements are keyboard accessible
-    const interactiveElements = [heart, lockIcon, ...wallpaperButtons];
+    const interactiveElements = [heart, lockIcon];
 
     interactiveElements.forEach(el => {
         if (!el.hasAttribute('tabindex')) {
@@ -1049,104 +1003,11 @@ function checkReducedMotion() {
     });
 }
 
-/* ===== SOUND SYSTEM (Web Audio API) ===== */
-const SoundManager = {
-    ctx: null,
-    isMuted: true,
 
-    init() {
-        try {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            this.ctx = new AudioContext();
-            this.loadState();
-            this.updateUI();
-        } catch (e) {
-            console.warn('Web Audio API not supported');
-        }
-    },
-
-    resume() {
-        if (this.ctx && this.ctx.state === 'suspended') {
-            this.ctx.resume();
-        }
-    },
-
-    toggleMute() {
-        this.isMuted = !this.isMuted;
-        this.saveState();
-        this.resume();
-        this.updateUI();
-
-        // Play a test sound if unmuting
-        if (!this.isMuted) {
-            this.playClick();
-        }
-
-        return this.isMuted;
-    },
-
-    updateUI() {
-        // No dashboard UI update needed, handled by global sync
-    },
-
-    saveState() {
-        localStorage.setItem('heartbeat_muted', this.isMuted);
-    },
-
-    loadState() {
-        const saved = localStorage.getItem('heartbeat_muted');
-        // Default to muted (true) if not set, or use saved value
-        this.isMuted = saved === null ? true : saved === 'true';
-    },
-
-    playTone(freq, type, duration, volume = 0.1, startTime = 0) {
-        if (this.isMuted || !this.ctx) return;
-
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-
-        osc.type = type;
-        osc.frequency.value = freq;
-
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-
-        const now = this.ctx.currentTime + startTime;
-        gain.gain.setValueAtTime(0, now);
-        gain.gain.linearRampToValueAtTime(volume, now + 0.05);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
-
-        osc.start(now);
-        osc.stop(now + duration + 0.1);
-    },
-
-    playClick() {
-        // Soft "droplet" sound (sine waves) - Louder
-        this.playTone(300, 'sine', 0.15, 0.15);
-        this.playTone(500, 'sine', 0.1, 0.1, 0.05);
-    },
-
-    playUnlock() {
-        // Magical chime (ascending major chord) - Louder
-        this.playTone(261.63, 'sine', 0.6, 0.1, 0);    // C4
-        this.playTone(329.63, 'sine', 0.6, 0.1, 0.1);  // E4
-        this.playTone(392.00, 'sine', 0.6, 0.1, 0.2);  // G4
-        this.playTone(523.25, 'sine', 1.0, 0.15, 0.3);  // C5
-    }
-};
 
 /* ===== UI CONTROLS ===== */
 function setupControls() {
-    const toggleSound = document.getElementById('toggleSound');
     const toggleBreathing = document.getElementById('toggleBreathing');
-    const breathingGuide = document.getElementById('breathingGuide');
-
-    // Sound Toggle
-    if (toggleSound) {
-        toggleSound.addEventListener('click', () => {
-            SoundManager.toggleMute();
-        });
-    }
 
     // Breathing System
     window.BreathingMode = {
@@ -1160,10 +1021,7 @@ function setupControls() {
             }
             document.body.classList.toggle('breathing-active', this.isActive);
 
-            // Play sound if starting
-            if (this.isActive && typeof SoundManager !== 'undefined' && !SoundManager.isMuted) {
-                SoundManager.playClick();
-            }
+
 
             return this.isActive;
         }
@@ -1254,9 +1112,7 @@ const TimerManager = {
     finish() {
         this.pause();
         this.display.classList.add('finished');
-        if (typeof SoundManager !== 'undefined' && !SoundManager.isMuted) {
-            SoundManager.playUnlock();
-        }
+
     },
 
     updateDisplay() {
