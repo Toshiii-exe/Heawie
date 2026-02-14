@@ -1,6 +1,6 @@
 {
     "name": "heawie",
-    "version": "1.9.2",
+    "version": "1.9.3",
     "description": "Heawie - A minimal browser with the Heartbeat experience as home",
     "main": "main.js",
     "scripts": {

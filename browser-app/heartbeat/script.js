@@ -41,7 +41,7 @@ const CONFIG = {
     minAnimationDuration: 1200, // Fastest pulse
 
     // Dynamic Secret Message Configuration
-    messagesJsonUrl: 'messages.json', // Path to messages file (local relative path)
+    messagesJsonUrl: 'https://raw.githubusercontent.com/Toshiii-exe/Heawie/main/browser-app/heartbeat/messages.json', // Path to messages file (GitHub URL)
     messageFetchMode: 'latest', // 'latest' or 'random'
     cacheBustParam: true, // Add timestamp to prevent caching
 
@@ -123,8 +123,6 @@ function init() {
     setupSearchBar();
 
     setupControls();
-    TimerManager.init(); // Initialize Timer
-    TodoManager.init();  // Initialize Todos
     TimerManager.init(); // Initialize Timer
     TodoManager.init();  // Initialize Todos
     startClock();
@@ -947,7 +945,19 @@ const TimerManager = {
         if (this.customInput) {
             this.customInput.addEventListener('change', () => {
                 const mins = parseInt(this.customInput.value);
-                if (mins > 0) this.setTime(mins * 60);
+                if (mins > 0) {
+                    this.setTime(mins * 60);
+                    this.customInput.value = ''; // Clear after setting
+                }
+            });
+            this.customInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const mins = parseInt(this.customInput.value);
+                    if (mins > 0) {
+                        this.setTime(mins * 60);
+                        this.customInput.value = '';
+                    }
+                }
             });
         }
 
@@ -965,12 +975,20 @@ const TimerManager = {
         this.pause();
         this.totalSeconds = secs;
         this.remainingSeconds = secs;
+        this.display.classList.remove('finished');
         this.updateDisplay();
     },
 
     toggle() {
-        if (this.isRunning) this.pause();
-        else this.start();
+        if (this.isRunning) {
+            this.pause();
+        } else {
+            // If at zero, reset before starting
+            if (this.remainingSeconds <= 0) {
+                this.remainingSeconds = this.totalSeconds;
+            }
+            this.start();
+        }
     },
 
     start() {
@@ -979,12 +997,18 @@ const TimerManager = {
         this.btnToggle.textContent = 'Pause';
         this.display.classList.remove('finished');
 
+        // Immediate feedback
+        this.updateDisplay();
+
         this.interval = setInterval(() => {
             this.remainingSeconds--;
-            this.updateDisplay();
 
             if (this.remainingSeconds <= 0) {
+                this.remainingSeconds = 0; // Ensure exactly zero
+                this.updateDisplay();
                 this.finish();
+            } else {
+                this.updateDisplay();
             }
         }, 1000);
     },
@@ -1015,7 +1039,7 @@ const TimerManager = {
         this.display.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 
         // Visual feedback when low
-        if (this.remainingSeconds < 10 && this.remainingSeconds > 0) {
+        if (this.remainingSeconds < 10 && this.remainingSeconds >= 0) {
             this.display.style.color = 'var(--heart-color-end)';
         } else {
             this.display.style.color = '';
