@@ -1,12 +1,16 @@
 {
     "name": "heawie",
-    "version": "1.9.3",
+    "version": "1.9.4",
     "description": "Heawie - A minimal browser with the Heartbeat experience as home",
     "main": "main.js",
     "scripts": {
         "start": "set ELECTRON_RUN_AS_NODE=&& electron .",
         "build": "electron-builder",
         "build:win": "electron-builder --win --x64"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Toshiii-exe/Heawie.git"
     },
     "keywords": [
         "heawie",
@@ -15,6 +19,9 @@
     ],
     "author": "Heawie",
     "license": "MIT",
+    "dependencies": {
+        "electron-updater": "^6.1.7"
+    },
     "devDependencies": {
         "electron": "^28.0.0",
         "electron-builder": "^24.9.1"
@@ -25,6 +32,13 @@
         "directories": {
             "output": "dist"
         },
+        "publish": [
+            {
+                "provider": "github",
+                "owner": "Toshiii-exe",
+                "repo": "Heawie"
+            }
+        ],
         "win": {
             "target": [
                 {

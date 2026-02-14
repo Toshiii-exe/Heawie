@@ -58,9 +58,37 @@ function createWindow() {
     });
 }
 
+const { autoUpdater } = require('electron-updater');
+
 // App lifecycle
 app.whenReady().then(() => {
     createWindow();
+
+    // Check for updates
+    autoUpdater.checkForUpdatesAndNotify();
+
+    // Update logging
+    autoUpdater.on('checking-for-update', () => {
+        fs.appendFileSync(path.join(__dirname, 'startup_log.txt'), '\nChecking for update...');
+    });
+    autoUpdater.on('update-available', (info) => {
+        fs.appendFileSync(path.join(__dirname, 'startup_log.txt'), `\nUpdate available: ${info.version}`);
+    });
+    autoUpdater.on('update-not-available', (info) => {
+        fs.appendFileSync(path.join(__dirname, 'startup_log.txt'), '\nUpdate not available.');
+    });
+    autoUpdater.on('error', (err) => {
+        fs.appendFileSync(path.join(__dirname, 'startup_log.txt'), `\nError in auto-updater: ${err}`);
+    });
+    autoUpdater.on('download-progress', (progressObj) => {
+        let log_message = "\nDownload speed: " + progressObj.bytesPerSecond;
+        log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
+        log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
+        fs.appendFileSync(path.join(__dirname, 'startup_log.txt'), log_message);
+    });
+    autoUpdater.on('update-downloaded', (info) => {
+        fs.appendFileSync(path.join(__dirname, 'startup_log.txt'), '\nUpdate downloaded; will install on quit.');
+    });
 
     app.on('activate', () => {
         if (BrowserWindow.getAllWindows().length === 0) {
